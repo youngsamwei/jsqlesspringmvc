@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdkd.ccse.jsqles.mapper.ExclassMapper">
+    <cache/>
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+        exclassid, exclassname
+    </sql>
+
+    <resultMap id="exclass" type="Exclass">
+        <id property="exclassid" column="exclassid"/>
+        <result property="exclassname" column="exclassname"/>
+    </resultMap>
+
+    <resultMap id="exclassTree" type="ExclassVO">
+        <id property="exclassid" column="exclassid"/>
+        <result property="exclassname" column="exclassname"/>
+        <result property="pid" column="pid"/>
+    </resultMap>
+
+    <!-- 查询指定用户的所属实验班级，可能返回多个实验班级, 需要缓存 -->
+    <select id="selectExclassByUserid" resultMap="exclass">
+
+        select exc.exclassid, exc.exclassname
+        from exclass exc join exclass_organization eo on exc.exclassid = eo.exclassid
+            join organization o on o.id = eo.organizationid
+            join user u on u.organization_id = o.id
+        where u.id = #{userid}
+    </select>
+
+    <select id="selectTree" resultMap="exclassTree">
+        select exclassid, exclassname, -1 as pid
+        from exclass
+        union
+        select o.id as exclassid, o.name as exclassname, exc.exclassid as pid
+        from organization o
+            join exclass_organization eo on o.id = eo.organizationid
+            join exclass exc on exc.exclassid = eo.exclassid
+    </select>
+
+    <resultMap id="class" type="Organization">
+        <id  property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="icon" column="icon"/>
+    </resultMap>
+
+    <!-- 查询指定实验班级中的行政班级 -->
+    <select id="selectLinkedClass" resultMap="class">
+        select o.id, o.name, o.icon
+        from organization o join exclass_organization eo on o.id = eo.organizationid
+        where eo.exclassid = ${exclassid}
+    </select>
+    <!-- 查询不属于指定实验班级中的行政班级 -->
+    <select id="selectUnlinkedClass" resultMap="class">
+        select o.id, o.name, o.icon
+        from organization o
+        where o.id not in (select eo.organizationid from
+            exclass_organization eo where eo.exclassid = ${exclassid}
+        )
+    </select>
+
+    <!-- 用于刷新缓存：当增加或删除实验班级中的行政班级后调用 -->
+    <update id="refreshCache" flushCache="true">
+        select 1
+    </update>
+</mapper>

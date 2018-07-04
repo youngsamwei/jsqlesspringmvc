@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdkd.ccse.jsqles.mapper.ExamCurrMapper">
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+        EXAM_CURR_ID, EXAMID, WEEK, CURRICULAID
+    </sql>
+
+    <select id="selectExamCurrPage" resultType="Map">
+        SELECT   <include refid="Base_Column_List"/>
+        FROM exam_curr ec
+        <where>
+            <if test=" curriculaid != null ">
+                <![CDATA[ (ec.curriculaid = #{curriculaid}   )]]>
+            </if>
+            <if test=" examid != null ">
+                <![CDATA[ and ec.examid = #{examid} ]]>
+            </if>
+            <if test=" examCurrId != null ">
+                <![CDATA[ and ec.examCurrId = #{examCurrId} ]]>
+            </if>
+            <if test=" week != null ">
+                <![CDATA[ and ec.week = #{week} ]]>
+            </if>
+        </where>
+
+    </select>
+
+    <select id="selectExamCurrNamedPage" resultType="Map">
+        SELECT    EXAM_CURR_ID, ec.EXAMID, WEEK, CURRICULAID, exam.EXAMNAME
+        FROM exam_curr ec join examination exam on exam.examid = ec.examid
+
+        <where>
+            <if test=" curriculaid != null ">
+                <![CDATA[ (ec.curriculaid = #{curriculaid}   )]]>
+            </if>
+            <if test=" examid != null ">
+                <![CDATA[ and ec.examid = #{examid} ]]>
+            </if>
+            <if test=" examCurrId != null ">
+                <![CDATA[ and ec.examCurrId = #{examCurrId} ]]>
+            </if>
+            <if test=" week != null ">
+                <![CDATA[ and ec.week = #{week} ]]>
+            </if>
+        </where>
+
+    </select>
+</mapper>

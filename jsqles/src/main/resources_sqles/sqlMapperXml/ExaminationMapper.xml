@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdkd.ccse.jsqles.mapper.ExaminationMapper">
+    <cache/>
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+        EXAMID, EXAMNAME, is_Open as isOpen
+    </sql>
+
+    <resultMap id="examination" type="Examination">
+        <id property="examid" column="examid" />
+        <result property="examname" column="examname"/>
+    </resultMap>
+
+    <select id="selectListByCurricula" >
+        SELECT curriculaid, classno, o.name as classname, termid,
+        case
+        when sy.name is null then s.name
+        else concat(sy.name,' ', s.name)
+        end as termname, section, weekday, startweek, endweek
+        from curricula c join organization o on o.id = c.classno
+        join schoolyearterm s on c.termid = s.id
+        left join schoolyearterm sy on sy.id = s.pid
+        <where>
+            <if test=" termid != null ">
+                <![CDATA[ (c.termid = #{termid}  or c.termid in ( select id from schoolyearterm where pid = #{termid}) )]]>
+            </if>
+            <if test=" section != null ">
+                <![CDATA[ and c.section = #{section} ]]>
+            </if>
+            <if test=" weekday != null ">
+                <![CDATA[ and c.weekday = #{weekday} ]]>
+            </if>
+        </where>
+
+    </select>
+
+    <!-- 查询实验班级当前时间的实验列表，为提高查询效率，需要缓存 -->
+    <select id="selectCurrentExaminationListByExclassid" resultMap="examination">
+        select distinct exam.examid, exam.examname
+        from examination exam join exam_curr ec on exam.examid = ec.examid
+        join curricula c on ec.curriculaid = c.curriculaid
+        join Schoolyearterm syt on syt.id = c.termid
+        <where>
+            1 = 1 or <!-- 调试时使用, 返回所有的实验-->
+            <if test=" currdate != null ">
+                #{currdate} between syt.startdate and syt.enddate       <!-- 判断是否当前学期 -->
+                and floor(datediff(#{currdate}, syt.startdate) / 7)  + 1 = ec.week  <!-- 当前周 -->
+                and WEEKDAY(#{currdate})  + 1= c.weekday                    <!-- 当前周次 -->
+                and case when DATE_FORMAT(#{currdate},   '%H:%i:%S') between '07:50:00' and '09:50:00' then 1  <!-- 节次，需要处理夏季作息时间 -->
+                    when DATE_FORMAT(#{currdate},   '%H:%i:%S') between '09:50:01' and '12:00:00' then 2
+                    when DATE_FORMAT(#{currdate},   '%H:%i:%S') between '14:20:00' and '16:20:00' then 3
+                    when DATE_FORMAT(#{currdate},   '%H:%i:%S') between '16:20:01' and '19:00:00' then 4
+                    when DATE_FORMAT(#{currdate},   '%H:%i:%S') between '19:00:01' and '22:00:00' then 5
+                else 0 end = c.section
+                and c.classno in
+                <foreach item="item" index="index" collection="classnos" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+
+            </if>
+        </where>
+    </select>
+
+    <update id="refreshCache" flushCache="true">
+        select 1
+    </update>
+</mapper>

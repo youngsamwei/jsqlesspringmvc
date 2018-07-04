@@ -1,0 +1,33 @@
+{"database":[{"name":"testdb","files":[{"name":"testdb","fileid":1,"filename":"D:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\testdb.mdf","filegroup":"PRIMARY","size":"2304 KB","maxsize":"Unlimited","growth":"1024 KB","usage":"data only"},{"name":"testdb_log","fileid":2,"filename":"D:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA\testdb_log.LDF","filegroup":null,"size":"576 KB","maxsize":"2147483648 KB","growth":"10%","usage":"log only"}],"tables":[{"schema_name":"dbo","type":"user table","name":"student","full_name":"dbo.student","object_id":2137058649,"columns":[{"Column_name":"sno","Type":"char","Computed":"no","Length":10,"Prec":"     ","Scale":"     ","Nullable":"no","TrimTrailingBlanks":"no","FixedLenNullInSource":"no","Collation":"Chinese_PRC_CI_AS"},{"Column_name":"sname","Type":"char","Computed":"no","Length":8,"Prec":"     ","Scale":"     ","Nullable":"no","TrimTrailingBlanks":"no","FixedLenNullInSource":"no","Collation":"Chinese_PRC_CI_AS"},{"Column_name":"sage","Type":"char","Computed":"no","Length":10,"Prec":"     ","Scale":"     ","Nullable":"yes","TrimTrailingBlanks":"no","FixedLenNullInSource":"yes","Collation":"Chinese_PRC_CI_AS"},{"Column_name":"ssex","Type":"char","Computed":"no","Length":6,"Prec":"     ","Scale":"     ","Nullable":"yes","TrimTrailingBlanks":"no","FixedLenNullInSource":"yes","Collation":"Chinese_PRC_CI_AS"},{"Column_name":"sdept","Type":"char","Computed":"no","Length":8,"Prec":"     ","Scale":"     ","Nullable":"yes","TrimTrailingBlanks":"no","FixedLenNullInSource":"yes","Collation":"Chinese_PRC_CI_AS"}],"indexes":[{"index_name":"PK__student__DDDF64467F60ED59","index_description":"clustered, unique, primary key located on PRIMARY","index_keys":"sno"}],"constraints":[{"constraint_type":"PRIMARY KEY (clustered)","constraint_name":"PK__student__DDDF64467F60ED59","delete_action":"(n/a)","update_action":"(n/a)","status_enabled":"(n/a)","status_for_replication":"(n/a)","constraint_keys":"sno"}],"data":[]}]}]}
+
+select exam.examid, exam.examname, ec.week, floor(datediff('2018-03-17 10:10:00.0', syt.startdate) / 7) + 1 ecweek, WEEKDAY('2018-03-17 10:10:00.0') + 1 cweekday,  c.weekday,
+case
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '07:50:00' and '09:50:00' then 1
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '09:50:01' and '12:00:00' then 2
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '14:20:00' and '16:20:00' then 3
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '16:20:01' and '19:00:00' then 4
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '19:00:01' and '22:00:00' then 5
+else 0 end csection, c.section
+from examination exam join exam_curr ec on exam.examid = ec.examid join curricula c on ec.curriculaid = c.curriculaid join Schoolyearterm syt on syt.id = c.termid
+WHERE '2018-03-17 10:10:00.0' between syt.startdate and syt.enddate and floor(datediff('2018-03-17 10:10:00.0', syt.startdate) / 7) + 1 = ec.week
+and WEEKDAY('2018-03-17 10:10:00.0') + 1= c.weekday and
+case
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '07:50:00' and '09:50:00' then 1
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '09:50:01' and '12:00:00' then 2
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '14:20:00' and '16:20:00' then 3
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '16:20:01' and '19:00:00' then 4
+when DATE_FORMAT('2018-03-17 10:10:00.0', '%H:%i:%S') between '19:00:01' and '22:00:00' then 5
+else 0 end = c.section
+and c.classno = 0
+
+select exam.examid, exam.examname
+from examination exam join exam_curr ec on exam.examid = ec.examid join curricula c on ec.curriculaid = c.curriculaid join Schoolyearterm syt on syt.id = c.termid
+WHERE ? between syt.startdate and syt.enddate and floor(datediff(?, syt.startdate) / 7) + 1 = ec.week
+and WEEKDAY(?) + 1= c.weekday and
+case when DATE_FORMAT(?, '%H:%i:%S') between '07:50:00' and '09:50:00' then 1
+when DATE_FORMAT(?, '%H:%i:%S') between '09:50:01' and '12:00:00' then 2
+when DATE_FORMAT(?, '%H:%i:%S') between '14:20:00' and '16:20:00' then 3
+when DATE_FORMAT(?, '%H:%i:%S') between '16:20:01' and '19:00:00' then 4
+when DATE_FORMAT(?, '%H:%i:%S') between '19:00:01' and '22:00:00' then 5
+else 0 end = c.section
+and c.classno in ( ? , ? )

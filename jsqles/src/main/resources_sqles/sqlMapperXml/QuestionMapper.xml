@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdkd.ccse.jsqles.mapper.QuestionMapper">
+
+    <cache/>
+    <update id="refreshCache" flushCache="true">
+        select 1
+    </update>
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+        quesid, quesname, quescontent, queseval, quesanswer, examid, quesrequired, quespreq, resultcheck, resultquery, ifpostext, postexttype
+    </sql>
+
+    <select id="selectById" resultType="Question" parameterType="java.lang.Long">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from question
+        <where>
+            quesid = #{quesid}
+        </where>
+    </select>
+
+    <select id="selectQuestionPage" resultType="Map">
+        SELECT
+            quesid, quesname, quescontent,
+            case when queseval is not null and  queseval != '' then '已设置' else '未设置' end queseval,
+            case when quespreq is not null and  quespreq != '' then '已设置' else '未设置' end quespreq,
+            case when resultquery is not null and  resultquery != '' then '已设置' else '未设置' end resultquery
+        from question
+        <where>
+            <if test=" quesname != null and quesname != '' ">
+                quesname = #{quesname}
+            </if>
+            <if test=" examid != null ">
+                examid = #{examid}
+            </if>
+
+        </where>
+
+    </select>
+
+    <select id="selectQuestionStatusByUser" resultType="Map">
+        select case when eb.eval is null then '' else eb.eval end eval, q.quesid, q.quesname, q.quescontent
+        from (select quesid, userid, max(posttime) posttime
+            from exercisebook
+            where userid = #{userid}
+            group by quesid, userid
+            ) ebstatus
+            join exercisebook eb on  ebstatus.quesid = eb.quesid and ebstatus.userid = eb.userid and ebstatus.posttime = eb.posttime
+            right join question q on q.quesid = eb.quesid
+        where q.examid = #{examid}
+    </select>
+
+    <update id="refreshCache" flushCache="true">
+        select 1
+    </update>
+</mapper>

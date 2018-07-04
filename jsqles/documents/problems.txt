@@ -1,0 +1,7 @@
+1, 提交的quescontent被转义，可能与MappingJackson2HttpMessageConverter配置有关
+2, 当配置URL权限是，配置了/question/config ，也能匹配/question/configPreq, 前缀匹配?
+3, linkbutton在ie11中无效, 使用 $('#preqconfig_btn').bind('click', {id : ${question.quesid}}, configQuestionPreqFun); 绑定带参数的函数调用。
+4, ie调试器不工作 https://www.ludou.org/win7-ie-11-f12-bug.html  安装 (KB3008923) 更新
+5, 此网站正在使用您的标识访问数据源 安全设为中低， 然后：“此网站使用的数据提供程序可能不安全”， 解决方法：在windows 2008 中默认启用增强IE安全设置，可以设置禁止。再将信任网站设为低。就可以了。
+6, 多个页面相互调用的时， 需要注意多个页面的html元素的id命名带来的问题，确保这些id是不重复的。
+7, ckeditor 多次使用后出现问题：有的readonly是true，有的readonly是false的情况下。

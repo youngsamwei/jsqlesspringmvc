@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdkd.ccse.jsqles.mapper.SchoolyeartermMapper">
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+        id, name, pid, startdate, enddate, weeks
+    </sql>
+
+    <select id="selectCurrentSchoolyearterm" resultType="SchoolyeartermVO">
+        select term.id as termid, term.name as termname,term.startdate as termstartdate, term.enddate as termenddate, term.weeks as termweeks ,
+            year.id as schoolYearId, year.name as schoolYearName
+        from Schoolyearterm term join Schoolyearterm year on term.pid = year.id
+        where NOW() between term.startdate and term.enddate
+
+    </select>
+
+
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdkd.ccse.jsqles.mapper.ExercisebookMapper">
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+        exerbookid, quesid, curriculaid, userid, answer, posttime, starttime, eval, postext, resultset
+    </sql>
+
+    <!-- 返回exerbookid的insert -->
+    <insert id="insertAndGetId" parameterType="Exercisebook" useGeneratedKeys="true" keyProperty="exerbookid">
+
+        insert into Exercisebook(quesid, curriculaid, userid, answer, posttime, starttime, eval, postext, resultset)
+        values (#{quesid},#{curriculaid},#{userid},#{answer},#{posttime},#{starttime},#{eval},#{postext},#{resultset})
+
+    </insert>
+</mapper>

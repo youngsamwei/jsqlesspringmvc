@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sdkd.ccse.jsqles.mapper.CurriculaMapper">
+
+    <resultMap id="curriculaVoResultMap" type="cn.sdkd.ccse.jsqles.model.CurriculaVO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="monday" property="monday" jdbcType="VARCHAR"/>
+        <result column="tuesday" property="tuesday" jdbcType="VARCHAR"/>
+        <result column="wednesday" property="wednesday" jdbcType="VARCHAR"/>
+        <result column="thursday" property="thursday" jdbcType="VARCHAR"/>
+        <result column="friday" property="friday" jdbcType="VARCHAR"/>
+        <result column="saturday" property="saturday" jdbcType="VARCHAR"/>
+        <result column="sunday" property="sunday" jdbcType="VARCHAR"/>
+
+    </resultMap>
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+        classno, teacherid, TERMID, SCHOOLYEARID, STARTWEEK, ENDWEEK, SECTION, WEEKDAY, CURRICULAID
+    </sql>
+
+    <!-- 以学期编号为参数查询行政班级的课表，2018-3-5以前采用的方法，现在不用了-->
+    <select id="selectCurriculaByTermId" resultType="Map" parameterType="java.lang.Long">
+
+        select weekday, section, GROUP_CONCAT(cast(name as char) order by name separator ';&lt;BR&gt;') curr
+        from (
+            select weekday, section, CONCAT(o.name,' (' , STARTWEEK , '~' , ENDWEEK , '周)') name
+            from curricula c join organization o on c.classno = o.id
+            where c.termid = #{id} or c.termid in ( select id from schoolyearterm where pid = #{id})
+        ) w
+        group by weekday, section
+    </select>
+
+    <!-- 以学期编号为参数查询实验班级的课表，2018-3-5-->
+    <select id="selectExclassCurriculaByTermId" resultType="Map" parameterType="java.lang.Long">
+
+        select weekday, section, GROUP_CONCAT(cast(name as char) order by name separator ';&lt;BR&gt;') curr
+        from (
+        select weekday, section, CONCAT(o.exclassname,' (' , STARTWEEK , '~' , ENDWEEK , '周)') name
+        from curricula c join exclass o on c.classno = o.exclassid
+        where c.termid = #{id} or c.termid in ( select id from schoolyearterm where pid = #{id})
+        ) w
+        group by weekday, section
+    </select>
+
+    <!-- 查询行政班级的课表，2018-3-5以前采用的方法，现在不用了-->
+    <select id="selectCurriculaPage" resultType="Map">
+        SELECT curriculaid, classno, o.name as classname, termid,
+            case
+                when sy.name is null then s.name
+                else concat(sy.name,' ', s.name)
+            end as termname, section, weekday, startweek, endweek
+        from curricula c join organization o on o.id = c.classno
+            join schoolyearterm s on c.termid = s.id
+            left join schoolyearterm sy on sy.id = s.pid
+        <where>
+            <if test=" termid != null ">
+                <![CDATA[ (c.termid = #{termid}  or c.termid in ( select id from schoolyearterm where pid = #{termid}) )]]>
+            </if>
+            <if test=" section != null ">
+                <![CDATA[ and c.section = #{section} ]]>
+            </if>
+            <if test=" weekday != null ">
+                <![CDATA[ and c.weekday = #{weekday} ]]>
+            </if>
+        </where>
+
+    </select>
+
+    <!-- 查询实验班级的课表，2018-3-5-->
+    <select id="selectExclassCurriculaPage" resultType="Map">
+        SELECT curriculaid, classno, o.exclassname as classname, termid,
+        case
+        when sy.name is null then s.name
+        else concat(sy.name,' ', s.name)
+        end as termname, section, weekday, startweek, endweek
+        from curricula c join exclass o on o.exclassid = c.classno
+        join schoolyearterm s on c.termid = s.id
+        left join schoolyearterm sy on sy.id = s.pid
+        <where>
+            <if test=" termid != null ">
+                <![CDATA[ (c.termid = #{termid}  or c.termid in ( select id from schoolyearterm where pid = #{termid}) )]]>
+            </if>
+            <if test=" section != null ">
+                <![CDATA[ and c.section = #{section} ]]>
+            </if>
+            <if test=" weekday != null ">
+                <![CDATA[ and c.weekday = #{weekday} ]]>
+            </if>
+        </where>
+
+    </select>
+
+    <!-- 查询教师的课表
+    <select id="selectTeacherCurricula" resultMap="Map">
+
+    </select>
+    -->
+</mapper>
