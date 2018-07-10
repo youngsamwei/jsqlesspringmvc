@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.sdkd.ccse.jsqles.mapper.ExaminationMapper">
-    <cache/>
+    <cache     />
 
     <!-- 通用查询结果列-->
     <sql id="Base_Column_List">
@@ -43,7 +43,7 @@
         join curricula c on ec.curriculaid = c.curriculaid
         join Schoolyearterm syt on syt.id = c.termid
         <where>
-            1 = 1 or <!-- 调试时使用, 返回所有的实验-->
+            1 = 1 and <!-- 调试时使用or, 返回所有的实验-->
             <if test=" currdate != null ">
                 #{currdate} between syt.startdate and syt.enddate       <!-- 判断是否当前学期 -->
                 and floor(datediff(#{currdate}, syt.startdate) / 7)  + 1 = ec.week  <!-- 当前周 -->

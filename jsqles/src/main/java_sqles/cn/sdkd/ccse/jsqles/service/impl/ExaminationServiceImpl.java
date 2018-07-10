@@ -55,13 +55,26 @@ public class ExaminationServiceImpl extends ServiceImpl<ExaminationMapper, Exami
         return trees;
     }
 
+    /**
+     *
+     * @param classnos
+     * @return
+     */
     public List<Tree> selectCurrentExaminationListByExclassid(List<Long>  classnos){
         long time = System.currentTimeMillis();
         Timestamp ts = new java.sql.Timestamp(time);
-        ts.setMinutes(10);
+        /*通过控制时间参数来决定缓存是否更新，一个小时刷新一次
+        * 也需要配合 上课的节次，比如7，8节课从4:20开始可以查询到实验
+        * */
+        if (ts.getMinutes() >= 20) {
+            ts.setMinutes(21);
+        }else{
+            ts.setMinutes(10);
+        }
         ts.setSeconds(0);
         ts.setNanos(0);
         List<Examination> examinationList = examinationMapper.selectCurrentExaminationListByExclassid(classnos, ts);
+
         return examList2Tree(examinationList);
     }
 

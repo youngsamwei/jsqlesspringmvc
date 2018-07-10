@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.wangzhixuan</groupId>
-    <artifactId>spring-shiro-training</artifactId>
+    <groupId>cn.sdkd.ccse</groupId>
+    <artifactId>jsqles</artifactId>
     <packaging>war</packaging>
     <version>1.3.0</version>
     <name>jsqles Maven Webapp</name>
@@ -199,10 +199,18 @@
             <artifactId>json</artifactId>
             <version>${json.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.jtds/jtds -->
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
-        <finalName>shiro</finalName>
+        <finalName>jsqles</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
