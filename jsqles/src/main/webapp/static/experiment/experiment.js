@@ -360,6 +360,10 @@ experiment.successHandler = function() {
     experiment.disabledBtn("submit", false)
 }
 
+/* TODO：在有的机器上无法捕获以下浏览器错误：
+Error:Automation服务器不能创建对象
+Error:此计算机上的安全设置禁止访问其它域的数据源。
+*/
 experiment.errorHandler = function(errorname, errormsg){
     experiment.disabledBtn("submit", false)
     var msg = (errorname?errorname:"")  + ":"+ (errormsg?errormsg:"")
