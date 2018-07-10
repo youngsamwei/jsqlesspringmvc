@@ -26,6 +26,8 @@ import com.wangzhixuan.service.IRoleService;
 import com.wangzhixuan.service.IUserService;
 
 /**
+ * 学生修改密码后，使用新旧密码都无法登陆的问题。
+ *
  * @description：shiro权限认证
  * @author：zhixuan.wang
  * @date：2015/10/1 14:51

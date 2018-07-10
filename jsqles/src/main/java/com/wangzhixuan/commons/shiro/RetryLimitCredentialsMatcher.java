@@ -35,6 +35,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
+ * TODO: 这个配置会导致学生尝试5次被锁定，需要解锁管理。
+ *
  * 输错5次密码锁定半小时，ehcache.xml配置
  * @author L.cm
  */
