@@ -91,6 +91,7 @@ public class ShiroDbRealm extends AuthorizingRealm {
     @Override
     public void onLogout(PrincipalCollection principals) {
         super.clearCachedAuthorizationInfo(principals);
+
         ShiroUser shiroUser = (ShiroUser) principals.getPrimaryPrincipal();
         removeUserCache(shiroUser);
     }

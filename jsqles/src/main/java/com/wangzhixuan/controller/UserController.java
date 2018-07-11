@@ -189,6 +189,7 @@ public class UserController extends BaseController {
 
     /**
      * 修改密码
+     * TODO:当shiro配置缓存用户认证信息authenticationCachingEnabled为true时，修改密码需要清空相关的缓存
      *
      * @param oldPwd
      * @param pwd

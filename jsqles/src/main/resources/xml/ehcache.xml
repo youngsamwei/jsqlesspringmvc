@@ -28,8 +28,18 @@
            overflowToDisk="false"
            statistics="true">
     </cache>
-    
-    <!-- 缓存半小时 -->
+
+ <!-- 缓存5分钟 用于缓存 输错密码5次以上的 -->
+ <cache name="minutes5"
+        maxElementsInMemory="10000"
+        maxElementsOnDisk="100000"
+        eternal="false"
+        timeToIdleSeconds="1800"
+        timeToLiveSeconds="1800"
+        overflowToDisk="false"
+        diskPersistent="false" />
+
+ <!-- 缓存半小时 -->
     <cache name="halfHour" 
         maxElementsInMemory="10000"
         maxElementsOnDisk="100000" 

@@ -29,7 +29,7 @@
         <constructor-arg index="0" name="cacheManager" ref="shiroSpringCacheManager"/>
         <constructor-arg index="1" name="matcher" ref="credentialsMatcher"/>
         <!-- 启用身份验证缓存，即缓存AuthenticationInfo信息，默认false -->
-        <property name="authenticationCachingEnabled" value="true"/>
+        <property name="authenticationCachingEnabled" value="false"/>
         <!-- 缓存AuthenticationInfo信息的缓存名称 -->
         <property name="authenticationCacheName" value="authenticationCache"/>
         <!-- 缓存AuthorizationInfo信息的缓存名称 -->
