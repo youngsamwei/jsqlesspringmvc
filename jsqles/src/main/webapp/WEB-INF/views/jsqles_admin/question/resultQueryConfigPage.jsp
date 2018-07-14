@@ -1,3 +1,9 @@
+<%--
+
+设置结果验证
+
+--%>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/commons/global.jsp" %>
 

@@ -28,6 +28,9 @@ var dbexplorer_jq = {};
         for (var key in dbtree){
             var child = {};
             var value = dbtree[key];
+            if (!value){
+                continue;
+            }
             var type = this.jsontypeof(value);
             if (type == "object"){
                 child = this.dbtree2json(key, value);

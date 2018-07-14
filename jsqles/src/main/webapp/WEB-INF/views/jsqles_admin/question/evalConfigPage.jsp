@@ -1,3 +1,9 @@
+<%--
+
+设置结构验证
+
+--%>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/commons/global.jsp" %>
 
@@ -46,8 +52,11 @@
                 }
             }
         });
-
-        var dbjson = dbexplorer_jq.getDBJson("exam");
+        /* 在 quesiontConfig 页面中的变量 */
+        var v = $('#quespreq').val();
+        var quespreq=$.parseJSON(v);
+        var db = quespreq ? quespreq.database[0].name : null;
+        var dbjson = dbexplorer_jq.getDBJson(db);
         evalOrgTree  = $('#evalOrgTree').tree({
                 url : '',
                 checkbox:true,

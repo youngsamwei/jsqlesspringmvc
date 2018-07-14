@@ -279,24 +279,43 @@ experiment.submit = function( ) {
     try {
         /* 获取结构数据 */
         var dbtree = null;
-        if (quesRequiredb) {
+         var resultset = null;
+
+        if (ifpostext){
+            var postext = $('#editSQLForm_textarea').val();
+            if (postext == "") {
+                  throw {name:"错误", message:"需要提交代码！"}
+            }
+        }
+        if (quesRequiredb) {/* 结构验证*/
             dbtree = dbmetadata2.getRequiredDBTree(quesRequiredb);
+        }else{/*结果验证*/
+            /*用户提交的代码，但有些题目不需要用户提交代码*/
+            var postext = $('#editSQLForm_textarea').val();
+
+            /* 获取结果数据 */
+            if (!resultquery) {
+                resultquery = postext;
+            }
+
+            if (typeof (resultquery) == "string" && resultquery.length > 0) {
+                resultset = dbmetadata2.query(resultquery, db);
+            }
         }
-        /*用户提交的代码，但有些题目不需要用户提交代码*/
-        var postext = $('#editSQLForm_textarea').val();
-        /* 获取结果数据 */
-        if (!resultquery) {
-            resultquery = postext;
-        }
-        var resultset = null;
-        if (typeof (resultquery) == "string" && resultquery.length > 0) {
-            resultset = dbmetadata2.query(resultquery, db);
-        }
-        /*使用JSON.stringify会把汉字转换为unicode，所以实用eval再变为汉字
+
+        /*使用JSON.stringify会把汉字转换为unicode，所以使用eval再变为汉字
         http://blog.csdn.net/yefengmeander/article/details/45192565
         */
-        eval("var encodeAnswer = '"+JSON2.stringify(dbtree)+"';");
-        eval("var encodeResultset = '"+JSON2.stringify(resultset)+"';");
+
+        /* 使用json2不对汉字转换为unicode，因此不必使用eval */
+        var jsonstr_dbtree = JSON2.stringify(dbtree);
+        var encodeAnswer = jsonstr_dbtree;
+//        eval("var encodeAnswer = '"+ jsonstr_dbtree + "';");
+/*20180714 使用eval时，在创建default的语句中包含单引号，因此提示缺少分号，现在已经不是用eval，因此已经没有这个错误*/
+
+        var jsonstr_resultset = JSON2.stringify(resultset);
+        var encodeResultset = jsonstr_resultset;
+//        eval("var encodeResultset = '"+ jsonstr_resultset +"';");
         $.ajax({
             type: 'POST',
             dataType : 'json',

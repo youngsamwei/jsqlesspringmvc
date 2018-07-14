@@ -78,6 +78,7 @@
     }
 
     function configQuestionEvalFun(id){
+
         $("#configQuestionEval").dialog({
             title: '设置结构验证',
             width : 700,

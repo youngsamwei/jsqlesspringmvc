@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.net.URLDecoder;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.sql.Wrapper;
@@ -166,6 +167,7 @@ public class ExperimentController  extends BaseController {
         exercisebook.setPosttime(t);
         exercisebook.setStarttime(t);
         exercisebook.setEval("not");
+
         try {
             Long count = this.exercisebookService.insertAndGetId(exercisebook);
             questionService.refreshCache();
