@@ -135,7 +135,7 @@ public class JSONUtils {
 		if (str2.equalsIgnoreCase("null")) {
 			str2 = "";
 		}
-		if (!str1.equals(str2)) {
+		if (!str1.equalsIgnoreCase(str2)) {
 			return (allKeys + "的值应该是:" + str1 + ", 而不是:" + str2);
 		}
 		return null;
