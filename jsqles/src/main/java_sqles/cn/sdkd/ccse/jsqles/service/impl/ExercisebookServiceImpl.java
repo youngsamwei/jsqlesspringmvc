@@ -69,6 +69,7 @@ public class ExercisebookServiceImpl extends ServiceImpl<ExercisebookMapper, Exe
         logger.debug("quesResult: " + quesResult);
 
         resultSet = StringEscapeUtils.unescapeHtml(resultSet);
+        quesResult = StringEscapeUtils.unescapeHtml(quesResult);
         answer = StringEscapeUtils.unescapeHtml(answer);
 
         logger.debug("answer: " + answer);
