@@ -7,6 +7,7 @@ import cn.sdkd.ccse.jsqles.service.IQuestionService;
 import com.wangzhixuan.commons.base.BaseController;
 import com.wangzhixuan.commons.result.PageInfo;
 import com.wangzhixuan.commons.utils.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -126,6 +127,10 @@ public class QuestionController extends BaseController {
     @RequestMapping("/edit")
     @ResponseBody
     public Object edit(@Valid Question question) {
+
+        /* 带html标记的string被转义，所以需要恢复 */
+        String content = StringEscapeUtils.unescapeHtml(question.getQuescontent());
+        question.setQuescontent(content);
         questionService.updateById(question);
         return renderSuccess("编辑成功！");
     }
