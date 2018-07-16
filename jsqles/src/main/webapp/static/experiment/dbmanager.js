@@ -1,3 +1,8 @@
+/*
+主要功能：连接数据库，执行数据库脚本，建立数据库,数据库表等对象。
+
+*/
+
 var dbmanager = {};
 
 dbmanager.isexpress = true;
@@ -299,4 +304,9 @@ dbmanager.getColumnDef = function(column) {
 
 dbmanager.dropTable = function() {
 
+}
+
+
+dbmanager.createRoleDDL = function(role){
+    return "create role " + role.role_name + ";";
 }

@@ -1,5 +1,6 @@
 /*
- * 
+ * 主要功能：从数据库获取数据库对象的数据以及元数据。
+
  * 数据库浏览器
  * 获取数据库的资源
  * 以树形结构展示给用户
@@ -165,6 +166,9 @@ dbmetadata2.getAllObjects = function(dbname) {
 		objrs.moveNext();
 	}
 
+    /* 增加对自定义role的初始化*/
+    this.getAllUserRoles(database);
+
 	this.closeConnection();
 
 	return database;
@@ -182,6 +186,23 @@ dbmetadata2.initJsonArray = function(o, name) {
 dbmetadata2.getAllUserTypes = function() {
 
 	return {};
+}
+
+dbmetadata2.getAllUserRoles = function(database){
+    var sql = "SELECT name, type, type_desc "
+               + " FROM sys.database_principals "
+               + " where name like 'role_%'";
+    var objrs = this.objdbConn.Execute(sql);
+
+    while (!objrs.EOF) {
+        var o = {};
+		o.role_name = objrs.Fields(0).Value;
+		this.initJsonArray(database, "roles");
+        database["roles"].push(o);
+
+        objrs.moveNext();
+    }
+
 }
 
 dbmetadata2.query_data = function(o, topN) {

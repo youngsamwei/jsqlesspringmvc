@@ -1,3 +1,8 @@
+/*
+主要功能：为用户显示数据库数据以及元数据.
+
+*/
+
 
     $.extend($.fn.tree.methods,{
         getLeafChildren:function(jq, params){

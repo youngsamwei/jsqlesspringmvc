@@ -235,6 +235,12 @@ experiment.createSQLText = function(quesPreq) {
 				sqls.push(dbmanager.createRuleDDL(rules[ri]));
 			}
 		}
+		var roles = database.roles;
+		if (roles){
+		    for (var ri = 0; ri < roles.length; ri++) {
+        				sqls.push(dbmanager.createRoleDDL(roles[ri]));
+        	}
+		}
 	}
 	return sqls;
 }

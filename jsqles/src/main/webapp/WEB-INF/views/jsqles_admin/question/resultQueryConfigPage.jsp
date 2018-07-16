@@ -14,6 +14,8 @@
     var  resultquery = '';
     var  resultcheck = '';
     var  resulterror = '';
+    var questionConfigEvalForm;
+
     $(function() {
 
         questionConfigEvalForm = $('#questionConfigEvalForm').form({

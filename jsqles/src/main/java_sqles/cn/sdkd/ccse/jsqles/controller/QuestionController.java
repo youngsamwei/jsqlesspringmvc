@@ -130,7 +130,13 @@ public class QuestionController extends BaseController {
 
         /* 带html标记的string被转义，所以需要恢复 */
         String content = StringEscapeUtils.unescapeHtml(question.getQuescontent());
+        String preq = StringEscapeUtils.unescapeHtml(question.getQuespreq());
+        String resultcheck = StringEscapeUtils.unescapeHtml(question.getResultcheck());
+        String resultquery = StringEscapeUtils.unescapeHtml(question.getResultquery());
         question.setQuescontent(content);
+        question.setQuespreq(preq);
+        question.setResultcheck(resultcheck);
+        question.setResultquery(resultquery);
         questionService.updateById(question);
         return renderSuccess("编辑成功！");
     }
