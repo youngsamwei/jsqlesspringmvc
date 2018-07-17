@@ -264,6 +264,7 @@ dbmetadata2.process_sphelp_resultset = function(o, nextRs) {
 }
 
 /* 从单条结果的rs中获取一个对象 */
+/* 2018-07-18 在从sqlserver查询得到的datetime，转换后丢失时间*/
 dbmetadata2.getPropertyFromResultSet = function(nextRs) {
 	var o = {};
 	for (var i = 0; i < nextRs.fields.count; i++) {

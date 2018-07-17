@@ -49,7 +49,7 @@
                 </tr>
 
                 <tr  style="height:90%">
-                    <td>设置周次</td>
+                    <td>设置在第几周做这个实验</td>
                     <td >  <input name="week" type="text" placeholder="周次" class="easyui-validatebox" style="width:100%" data-options="width:300,height:29, required:true" value="1">
    </td>
                 </tr>
