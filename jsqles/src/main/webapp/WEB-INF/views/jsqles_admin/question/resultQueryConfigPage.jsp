@@ -96,7 +96,7 @@
             var dbname = quespreq.database[0].name;
             var sql = $('#resultquery_sql').val();
             var jsonresult = dbmetadata2.query(sql, dbname);
-            var result = JSON.stringify(jsonresult);
+            var result = JSON2.stringify(jsonresult);
             $('#runsqlinfo').val('执行成功');
             resulterror = '';
         }catch(e){

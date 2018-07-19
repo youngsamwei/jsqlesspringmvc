@@ -27,8 +27,8 @@
                progressLoad();
                 var eval = getEval();
                 var evalrequired = dbexplorer_jq.dbStructureEvalRequiredClientObjects(eval);
-                evalstr = JSON.stringify(eval);
-                evalrequiredstr = JSON.stringify(evalrequired);
+                evalstr = JSON2.stringify(eval);
+                evalrequiredstr = JSON2.stringify(evalrequired);
                 /* 通过params传递额外的参数 */
                 params.queseval = evalstr;
                 params.quesrequired = evalrequiredstr;

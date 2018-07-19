@@ -43,7 +43,7 @@
         join curricula c on ec.curriculaid = c.curriculaid
         join Schoolyearterm syt on syt.id = c.termid
         <where>
-            1 = 1 and  <!-- 调试时使用or, 返回所有的实验-->
+            1 = 1 or  <!-- 调试时使用or, 返回所有的实验-->
             <if test=" currdate != null ">
                 #{currdate} between syt.startdate and syt.enddate       <!-- 判断是否当前学期 -->
                 and floor(datediff(#{currdate}, syt.startdate) / 7)  + 1 = ec.week  <!-- 当前周 -->

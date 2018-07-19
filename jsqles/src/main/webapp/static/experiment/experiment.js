@@ -272,7 +272,8 @@ experiment.submit = function( ) {
     var quesRequiredb = this.quesRequiredb;
     var ifpostext = this.ifpostext;
     var resultquery = this.resultquery;
-    var db = this.db;
+//    var db = this.db;
+    var db = this.quesPreq ? this.quesPreq.database[0].name : null;
 	experiment.disabledBtn("submit", true);
 	/*
 	 * 验证的过程： 1）若需要进行结构验证，则将dbtree提交至服务器进行结构比较。

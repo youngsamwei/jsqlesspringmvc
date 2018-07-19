@@ -102,7 +102,7 @@
          $("#configQuestionResultQuery").dialog({
             title: '设置结果验证',
             width : 700,
-            height : 800,
+            height : 700,
             closed: false,
             modal: true,
             href : '${path }/question/resultQueryConfigPage?id=' + id,

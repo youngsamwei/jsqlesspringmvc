@@ -110,7 +110,7 @@
          });
 
          function loadCurrExaminationDataGrid(index,row){
-           /* alert(index + ' : ' + JSON.stringify(row) )*/
+           /* alert(index + ' : ' + JSON2.stringify(row) )*/
             currExaminationDataGrid.datagrid('getPanel').panel('setTitle', row.termname + ' ' + row.classname + ' 的实验安排');
             currExaminationDataGrid.datagrid('load', {curriculaid:row.curriculaid});
          }

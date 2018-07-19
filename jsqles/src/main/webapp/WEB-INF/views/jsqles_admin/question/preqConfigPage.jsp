@@ -25,7 +25,7 @@
             onSubmit : function(params) {
                progressLoad();
                 var preq = getPreq();
-                preqstr = JSON.stringify(preq);
+                preqstr = JSON2.stringify(preq);
                 /* 通过params传递额外的参数 */
                 params.quespreq = preqstr;
 
