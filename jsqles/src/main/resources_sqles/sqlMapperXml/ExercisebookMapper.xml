@@ -14,4 +14,31 @@
         values (#{quesid},#{curriculaid},#{userid},#{answer},#{posttime},#{starttime},#{eval},#{postext},#{resultset})
 
     </insert>
+
+
+    <select id="selectQuestionSolvedRatio" resultType="Map">
+        set @quescount := 167;
+        set @stucount := 200;
+
+        select ratio, count(userid) stucount, count(userid)/ @stucount sturatio
+        from (
+        select userid ,
+        case
+        when count(distinct quesid)/@quescount = 1 then 1
+        when count(distinct quesid)/@quescount between 0.9 and 1 then 0.9
+        when count(distinct quesid)/@quescount between 0.7 and 0.9 then 0.7
+        when count(distinct quesid)/@quescount between 0.5 and 0.7 then 0.5
+        when count(distinct quesid)/@quescount between 0.3 and 0.5 then 0.3
+        when count(distinct quesid)/@quescount between 0 and 0.3 then 0.0
+
+        end ratio
+
+        from exercisebook eb
+        where eb.eval = 'solved'
+        group by userid
+        ) s
+        group by ratio
+        order by ratio desc
+    </select>
+
 </mapper>

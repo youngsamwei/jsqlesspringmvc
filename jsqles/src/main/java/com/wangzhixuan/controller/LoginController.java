@@ -57,6 +57,11 @@ public class LoginController extends BaseController {
     @GetMapping("/index")
     public String index(Model model) {
         SchoolyeartermVO schoolyearterm = schoolyeartermService.selectCurrentSchoolyearterm();
+        /*当前日期不属于任何学期时的异常处理*/
+        if (schoolyearterm == null){
+            schoolyearterm = new SchoolyeartermVO();
+            schoolyearterm.setTermid(-1L);
+        }
         model.addAttribute("currentTerm", schoolyearterm);
         return "index";
     }
