@@ -198,12 +198,18 @@ public class ExercisebookController extends BaseController {
         return renderSuccess("成功！");
     }
 
-    @PostMapping("/selectQuestionSolvedRatioDatagrid")
+    @RequestMapping("/selectQuestionSolvedRatioDatagrid")
     @ResponseBody
     public Object selectQuestionSolvedRatioDatagrid() {
-        PageInfo pageInfo = new PageInfo(1, 1, "","");
+        PageInfo pageInfo = new PageInfo(1, 100, "","");
 
         exercisebookService.selectQuestionSolvedRatio(pageInfo);
         return pageInfo;
     }
+
+    @GetMapping("/stats")
+    public String stats() {
+        return "jsqles_admin/stats/selectQuestionSolvedRatioDatagrid";
+    }
+
 }
