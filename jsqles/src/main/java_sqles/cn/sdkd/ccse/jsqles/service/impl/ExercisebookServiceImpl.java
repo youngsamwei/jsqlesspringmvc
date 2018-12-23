@@ -8,7 +8,9 @@ import cn.sdkd.ccse.jsqles.model.Exercisebook;
 import cn.sdkd.ccse.jsqles.model.Question;
 import cn.sdkd.ccse.jsqles.service.IExercisebookService;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.wangzhixuan.commons.result.PageInfo;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -138,5 +140,17 @@ public class ExercisebookServiceImpl extends ServiceImpl<ExercisebookMapper, Exe
 
     public Long insertAndGetId(Exercisebook exercisebook){
         return exercisebookMapper.insertAndGetId(exercisebook);
-    };
+    }
+
+    @Override
+    public void selectQuestionSolvedRatio(PageInfo pageInfo) {
+        Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageInfo.getNowpage(), pageInfo.getSize());
+        page.setOrderByField(pageInfo.getSort());
+        page.setAsc(pageInfo.getOrder().equalsIgnoreCase("asc"));
+        List<Map<String, Object>> list = exercisebookMapper.selectQuestionSolvedRatio(page) ;
+        pageInfo.setRows(list);
+        pageInfo.setTotal(page.getTotal());
+    }
+
+    ;
 }

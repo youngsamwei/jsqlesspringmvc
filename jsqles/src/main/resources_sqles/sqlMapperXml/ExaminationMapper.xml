@@ -63,6 +63,8 @@
         </where>
     </select>
 
+
+
     <update id="refreshCache" flushCache="true">
         select 1
     </update>
