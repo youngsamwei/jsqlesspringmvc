@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.sdkd.ccse.jsqles.mapper.ExclassMapper">
-    <cache/>
+    <!--<cache/> -->
     <!-- 通用查询结果列-->
     <sql id="Base_Column_List">
         exclassid, exclassname
@@ -23,19 +23,20 @@
 
         select exc.exclassid, exc.exclassname
         from exclass exc join exclass_organization eo on exc.exclassid = eo.exclassid
-            join organization o on o.id = eo.organizationid
-            join user u on u.organization_id = o.id
+        join organization o on o.id = eo.organizationid
+        join user u on u.organization_id = o.id
         where u.id = #{userid}
     </select>
 
+    <!-- 为了使得organization.id与exclass.id不冲突，所以采用organization.id + 100000的方法-->
     <select id="selectTree" resultMap="exclassTree">
         select exclassid, exclassname, -1 as pid
         from exclass
         union
-        select o.id as exclassid, o.name as exclassname, exc.exclassid as pid
+        select (100000+ o.id) as exclassid, o.name as exclassname, exc.exclassid as pid
         from organization o
-            join exclass_organization eo on o.id = eo.organizationid
-            join exclass exc on exc.exclassid = eo.exclassid
+        join exclass_organization eo on o.id = eo.organizationid
+        join exclass exc on exc.exclassid = eo.exclassid
     </select>
 
     <resultMap id="class" type="Organization">
@@ -55,7 +56,7 @@
         select o.id, o.name, o.icon
         from organization o
         where o.id not in (select eo.organizationid from
-            exclass_organization eo where eo.exclassid = ${exclassid}
+        exclass_organization eo where eo.exclassid = ${exclassid}
         )
     </select>
 
