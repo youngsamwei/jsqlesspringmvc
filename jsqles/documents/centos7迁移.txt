@@ -1,0 +1,15 @@
+迁移至centos7上运行
+1）安装jdk8
+
+2）安装apache
+
+或使用yum安装nigix https://blog.csdn.net/tladagio/article/details/79252585
+3）安装tomcat7
+
+4）安装pureftp
+创建用户sam_www
+https://www.centos.bz/2018/01/centos-7-%E5%AE%89%E8%A3%85pure-ftp/
+注意文件夹的权限设置，因为权限会出现不能切换目录，
+
+6）安装mysql
+注意设置不区分大小写，在/etc/my.cnf中的[mysqld]中增加lower_case_table_names=1，然后重启

@@ -1,0 +1,45 @@
+下一步计划使用chrome插件实现实验界面。
+需要实现从插件中访问mssql
+一、解决方案一：使用chrome插件运行sqlcmd
+参考：https://developer.chrome.com/extensions/nativeMessaging
+参考：https://blog.csdn.net/zjqlovelyy/article/details/40183643
+
+详细的通信方式介绍参考：
+https://blog.csdn.net/lee353086/article/details/49362811
+https://blog.csdn.net/lee353086/article/details/49362811
+
+设置扩展白名单：https://blog.csdn.net/jnxxhzz/article/details/78542360
+
+二、解决方案二：现有可行方法是把nodsjs中的mssql驱动转换为chrome中可用
+(这种方法暂时不可行2019-7-31)
+
+需要的版本
+node v10.16.0
+npm 6.9.0
+mssql@5.1.0
+babelify@9.0.0
+@babel/core@7.5.5
+@babel/preset-env@7.5.5
+
+然后执行
+cd node_modules
+browserify -r mssql/:mssql > node-mssql.js
+
+常见问题：
+1）当出现Uncaught ReferenceError: regeneratorRuntime is not defined时
+browserify -r babel-polyfill/:babel-polyfill > babel-polyfill.js
+在manifest.json中增加babel-polyfill.js
+在background.js最前增加require("babel-polyfill");
+
+2）当使用socket时chrome仅允许应用商店中的应用，因此需要使用Policy Templates设置白名单，请参考http://www.phpvar.com/archives/3795.html
+
+3）出现TypeError: createSecureContext is not a function时
+
+
+
+node v 12.7.0
+npm 6.10.0
+
+探索路径：
+1）使用mssql2到达driver is not a function
+2）使用msnodesqlv8到达 require('fs').readdirSync is not a function
