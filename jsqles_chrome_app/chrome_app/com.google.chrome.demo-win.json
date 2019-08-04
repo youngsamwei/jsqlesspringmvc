@@ -1,0 +1,9 @@
+{
+  "name": "com.google.chrome.demo",
+  "description": "Chrome Native Messaging API Example Host",
+  "path": "c:\\start_host.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://oeejofojochggegmkbmjbjhiojakbcme/"
+  ]
+}

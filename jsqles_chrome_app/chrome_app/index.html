@@ -1,0 +1,40 @@
+<html>
+<head>
+    <script type="text/javascript">
+
+		window.onload=function(){
+			//after html loaded
+			var obj = document.getElementById('response_div_id');
+			obj.addEventListener('customEvent', function(e){
+				console.log('customEvent 事件触发了=>'+e.detail.data);
+			}, false);
+		}
+
+		  // The ID of the extension we want to talk to.
+			var kagulaExtensionId = "oeejofojochggegmkbmjbjhiojakbcme";
+
+			function requestConnect()
+			{
+				console.log("connect");
+				chrome.runtime.sendMessage(kagulaExtensionId, {data: "connect"});
+			}
+
+			function requestEcho()
+			{
+				console.log("Make a simple request");
+				var reqData =   document.getElementById('input-text').value;
+				chrome.runtime.sendMessage(kagulaExtensionId, {data: reqData},
+				  function(response) {
+				  	console.log(response);
+				});
+			}
+		</script>
+</head>
+<body>
+<button id='connect-button' OnClick="javascript:requestConnect()">connect</button>
+<input id='input-text' type='text' value='fromKagula'/>
+<button id='send-message-button' OnClick="javascript:requestEcho()">send message</button>
+
+<div id="response_div_id"></div>
+</body>
+</html>

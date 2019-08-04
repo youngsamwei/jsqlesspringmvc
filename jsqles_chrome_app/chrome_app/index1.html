@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+<script>
+function startApp() {
+	<!--var evt = document.createEvent("CustomEvent");-->
+	<!--evt.initCustomEvent('myCustomEvent', true, false, "im information");-->
+	<!--// fire the event-->
+	<!--document.dispatchEvent(evt);-->
+
+	var evt = document.createEvent("CustomEvent");
+	evt.initCustomEvent('jsqles_evt_get_sqlversion', true, false, "jsqles_evt_get_sqlversion");
+	// fire the event
+	document.dispatchEvent(evt);
+}
+
+</script>
+</head>
+<body>
+
+<button type="button" onClick="startApp()" id="startApp">startApp</button>
+</body>
+</html>
