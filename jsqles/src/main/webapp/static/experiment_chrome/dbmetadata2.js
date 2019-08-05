@@ -322,17 +322,18 @@ dbmetadata2.query = function(sql) {
 	}
 }
 
-dbmetadata2.query = function(sql, dbname) {
+/*在chrome中采用扩展实现*/
+dbmetadata2.query = function(sql, dbname, submit_callback) {
 	if (sql) {
-		if (dbname)
-			this.initConnection(dbname)
-		else
-			this.initConnection()
+        var jsqlesChromeExtensionId = "oeejofojochggegmkbmjbjhiojakbcme";
+        var request = {requestType: "query", dbname:dbname, sqlText:sql};
+        chrome.runtime.sendMessage(jsqlesChromeExtensionId, request,
+          function(response) {
+            console.log("response: " + JSON.stringify(response));
+            submit_callback(response);
+            return ;
+        });
 
-		var rs = this.objdbConn.Execute(sql);
-		var json = this.getPropertiesFromResultSet(rs);
-		this.closeConnection();
-		return json;
 	} else {
 		return {}
 	}
