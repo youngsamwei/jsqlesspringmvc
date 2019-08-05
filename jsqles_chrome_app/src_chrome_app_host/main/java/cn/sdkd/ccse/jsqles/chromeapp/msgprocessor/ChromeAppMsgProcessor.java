@@ -53,7 +53,21 @@ public class ChromeAppMsgProcessor {
                         for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                             l += "\"" + rs.getMetaData().getColumnName(i) + "\"";
                             l += ":";
-                            l += "\"" + rs.getString(i) + "\"";
+                            int dataType = rs.getMetaData().getColumnType(i);
+                            if (dataType == -7  //bit
+                                    || dataType == -6  //tinyint
+                                    || dataType == -5  //bigint
+                                    || dataType == 2   //numeric
+                                    || dataType == 3   //decimal
+                                    || dataType == 4   //integer
+                                    || dataType == 5   //smallint
+                                    || dataType == 6   //float
+                                    || dataType == 7   //real
+                                    || dataType == 8   /*double*/){
+                                l += rs.getString(i);
+                            }else {
+                                l += "\"" + rs.getString(i) + "\"";
+                            }
                             if (i < rs.getMetaData().getColumnCount()) {
                                 l += ",";
                             }
