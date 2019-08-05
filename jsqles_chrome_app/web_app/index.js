@@ -21,9 +21,12 @@
 			function requestEcho()
 			{
 				console.log("Make a simple request");
-				var reqData =   document.getElementById('input-text').value;
-				chrome.runtime.sendMessage(kagulaExtensionId, {data: reqData},
-				  function(response) {
-				  	console.log("response: " + JSON.stringify(response));
-				});
+				var sql =   document.getElementById('input-text').value;
+                var request = {requestType: "query", dbname:"testdb", sqlText:sql};
+                chrome.runtime.sendMessage(kagulaExtensionId, request,
+                  function(response) {
+                    console.log("response: " + JSON.stringify(response));
+                    return response;
+                });
+
 			}

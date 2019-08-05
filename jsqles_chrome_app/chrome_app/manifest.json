@@ -19,7 +19,7 @@
 		"nativeMessaging",
 		"tabs",
 		"http://localhost:8080/*",
-		"http://127.0.0.1:8080/*"
+		"http://localhost:9090/*"
 	],
 /*
 	"content_scripts": [
@@ -31,7 +31,8 @@
 	/*从外部网页访问chrome扩展应用需要配置*/
 	"externally_connectable": {
 		"matches": [
-			"http://localhost:8080/*"
+			"http://localhost:8080/*",
+			"http://localhost:9090/*"
 		]
 	}
 }

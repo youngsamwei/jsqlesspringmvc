@@ -46,8 +46,7 @@ public class ChromeAppMsgProcessor {
                     Statement stmt = con.createStatement();//创建Statement
                     ResultSet rs = stmt.executeQuery(caMsg.getSqlText());
 
-                    response = "{ \"result\":[";
-                    rs.next();
+                    response = "[";
                     while (rs.next()) {
                         String l = "{";
                         /*mssql resultset的下标从1开始*/
@@ -63,7 +62,7 @@ public class ChromeAppMsgProcessor {
                         l += "},";
                         response += l;
                     }
-                    response = response.substring(0, response.length() - 1) + "]}";
+                    response = response.substring(0, response.length() - 1) + "]";
                     rs.close();
                     stmt.close();
                     con.close();
