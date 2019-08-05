@@ -13,9 +13,9 @@
 			{
 				console.log("connect");
 				chrome.runtime.sendMessage(kagulaExtensionId, {data: "connect"},
-                                                              				  function(response) {
-                                                              				  	console.log(response);
-                                                              				});
+                      function(response) {
+                        console.log(response);
+                });
 			}
 
 			function requestEcho()
@@ -24,6 +24,6 @@
 				var reqData =   document.getElementById('input-text').value;
 				chrome.runtime.sendMessage(kagulaExtensionId, {data: reqData},
 				  function(response) {
-				  	console.log(response);
+				  	console.log("response: " + JSON.stringify(response));
 				});
 			}

@@ -21,12 +21,13 @@
 		"http://localhost:8080/*",
 		"http://127.0.0.1:8080/*"
 	],
+/*
 	"content_scripts": [
 		{
 		"matches": ["http://localhost:8080/*", "http://127.0.0.1:8080/*"],
 		"js": ["content.js"]
 		}
-	],
+	],*/
 	/*从外部网页访问chrome扩展应用需要配置*/
 	"externally_connectable": {
 		"matches": [

@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 var port = null;
+var rsp = null;
 var hostName = "com.google.chrome.demo";
 function connect() {
   port = chrome.runtime.connectNative(hostName);
@@ -74,12 +75,19 @@ function connect() {
 }
 
 function onNativeMessage(message) {
+
 	console.log("onNativeMessage=>"+JSON.stringify(message));
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {data: JSON.stringify(message)}, function(response) {
-            console.log(JSON.stringify(message));
-        });
-    });
+
+    /*调用web页面的response处理函数*/
+	if (rsp){
+	    rsp(message);
+	    rsp = null;
+	}
+//	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//        chrome.tabs.sendMessage(tabs[0].id, {data: JSON.stringify(message)}, function(response) {
+//            console.log(JSON.stringify(message));
+//        });
+//    });
 }
 
 function onDisconnected() {
@@ -91,22 +99,19 @@ chrome.runtime.onMessageExternal.addListener(
     console.log("chrome.runtime.onMessageExternal.addListener in background.js");
 //    if (request.data)
       var data = request.data;
-      if(data=="connect")
-      {
+      if(data=="connect") {
       	connect();
-      }
-      else
-      {
-      	if(port==null)
-      	{
+      } else {
+      	if(port==null)	{
       		console.log("disconnect with"+hostName);
       		return false;
-      	}
-          message = {"requestType":"query", "dbname":"testdb", "sqlText": data};
-          port.postMessage(message);
-	      console.log("Hi, there is message ["+data+"]from the website");
-//	      var message = {"message": request.data};
-//	      port.postMessage(message);
+        }
+        /*保存web页面传递的response处理函数*/
+        rsp = sendResponse;
+        message = {"requestType":"query", "dbname":"testdb", "sqlText": data};
+        port.postMessage(message);
+        console.log("Hi, there is message ["+data+"]from the website");
+
       }
       return true;
   });
