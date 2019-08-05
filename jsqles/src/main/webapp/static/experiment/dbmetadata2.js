@@ -321,6 +321,23 @@ dbmetadata2.query = function(sql) {
 		return {}
 	}
 }
+/*
+dbmetadata2.query = function(sql, dbname) {
+	if (sql) {
+		if (dbname)
+			this.initConnection(dbname)
+		else
+			this.initConnection()
+
+		var rs = this.objdbConn.Execute(sql);
+		var json = this.getPropertiesFromResultSet(rs);
+		this.closeConnection();
+		return json;
+	} else {
+		return {}
+	}
+}
+*/
 dbmetadata2.query = function(sql, dbname) {
 	if (sql) {
 		if (dbname)

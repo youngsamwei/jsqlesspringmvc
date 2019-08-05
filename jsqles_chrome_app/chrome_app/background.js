@@ -76,10 +76,10 @@ function connect() {
 function onNativeMessage(message) {
 	console.log("onNativeMessage=>"+JSON.stringify(message));
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-  chrome.tabs.sendMessage(tabs[0].id, {data: JSON.stringify(message)}, function(response) {
-    console.log(JSON.stringify(message));
-  });
-});
+        chrome.tabs.sendMessage(tabs[0].id, {data: JSON.stringify(message)}, function(response) {
+            console.log(JSON.stringify(message));
+        });
+    });
 }
 
 function onDisconnected() {
@@ -89,7 +89,7 @@ function onDisconnected() {
 chrome.runtime.onMessageExternal.addListener(
   function(request, sender, sendResponse) {
     console.log("chrome.runtime.onMessageExternal.addListener in background.js");
-    if (request.data)
+//    if (request.data)
       var data = request.data;
       if(data=="connect")
       {
@@ -100,11 +100,13 @@ chrome.runtime.onMessageExternal.addListener(
       	if(port==null)
       	{
       		console.log("disconnect with"+hostName);
-      		return;
+      		return false;
       	}
-
+          message = {"requestType":"query", "dbname":"testdb", "sqlText": data};
+          port.postMessage(message);
 	      console.log("Hi, there is message ["+data+"]from the website");
-	      var message = {"message": request.data};
-	      port.postMessage(message);
+//	      var message = {"message": request.data};
+//	      port.postMessage(message);
       }
+      return true;
   });
