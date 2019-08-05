@@ -1,4 +1,3 @@
-rem VERY IMPORTANT echo off
 @echo off
 
-java cn.sdkd.ccse.jsqles.chrome.app.hostChromeAppHost
+java -jar jsqles_chrome_app_host.jar

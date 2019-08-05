@@ -34,6 +34,7 @@ public class ChromeAppMsgProcessor {
 
     }
 
+    /*注意：chrome要求的json格式严格*/
     public String process() throws SQLException, ClassNotFoundException {
 
         String response = "";
