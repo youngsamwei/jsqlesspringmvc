@@ -321,7 +321,7 @@ dbmetadata2.query = function(sql) {
 		return {}
 	}
 }
-/*
+
 dbmetadata2.query = function(sql, dbname) {
 	if (sql) {
 		if (dbname)
@@ -337,18 +337,18 @@ dbmetadata2.query = function(sql, dbname) {
 		return {}
 	}
 }
-*/
-dbmetadata2.query = function(sql, dbname) {
-	if (sql) {
-		if (dbname)
-			this.initConnection(dbname)
-		else
-			this.initConnection()
 
-		var rs = this.objdbConn.Execute(sql);
-		var json = this.getPropertiesFromResultSet(rs);
-		this.closeConnection();
-		return json;
+dbmetadata2.query = function(sql, dbname, submit_callback) {
+	if (sql) {
+        var kagulaExtensionId = "oeejofojochggegmkbmjbjhiojakbcme";
+        var request = {requestType: "query", dbname:dbname, sqlText:sql};
+        chrome.runtime.sendMessage(kagulaExtensionId, request,
+          function(response) {
+            console.log("response: " + JSON.stringify(response));
+            submit_callback(response);
+            return ;
+        });
+
 	} else {
 		return {}
 	}

@@ -306,7 +306,69 @@ experiment.submit = function( ) {
             }
 
             if (typeof (resultquery) == "string" && resultquery.length > 0) {
-                resultset = dbmetadata2.query(resultquery, db);
+                dbmetadata2.query(resultquery, db, function(resultset){
+                    /*使用JSON.stringify会把汉字转换为unicode，所以使用eval再变为汉字
+                    http://blog.csdn.net/yefengmeander/article/details/45192565
+                    */
+
+                    /* 使用json2不对汉字转换为unicode，因此不必使用eval */
+                    var jsonstr_dbtree = JSON2.stringify(dbtree);
+                    var encodeAnswer = jsonstr_dbtree;
+            //        eval("var encodeAnswer = '"+ jsonstr_dbtree + "';");
+            /*20180714 使用eval时，在创建default的语句中包含单引号，因此提示缺少分号，现在已经不是用eval，因此已经没有这个错误*/
+
+                    var jsonstr_resultset = JSON2.stringify(resultset);
+                    var encodeResultset = jsonstr_resultset;
+            //        eval("var encodeResultset = '"+ jsonstr_resultset +"';");
+                    $.ajax({
+                        type: 'POST',
+                        dataType : 'json',
+                        url : '/experiment/submit',
+                        data : {
+                            "quesid" : quesid,
+                            "answer" : encodeAnswer, /* 用于结构验证的操作结果 */
+                            "postext" : postext, /* 用户提交的代码，有些题目不需要用户提交代码。结构验证将来可能也需要用户提交代码。 */
+                            "resultset" : encodeResultset
+                        },
+                        success : function(msg) {
+                            var respjson = [];
+                            try {
+                                if (!msg || msg.length == 0) {
+                                    respjson = [];
+                                } else if (typeof msg == "string") {
+                                    respjson = eval("(" + msg + ")");
+                                } else {
+                                    respjson = msg;
+                                }
+                            } catch (err) {
+                                respjson = msg;
+                            }
+                            var info = "";
+                            if (respjson.success) {
+                                info = "操作正确。";
+                                experiment.disabledBtn("submit", true);
+                                $('#btn_init').hide();
+                                $('#submit').hide();
+                                $('#start').hide();
+                            } else {
+                                if (respjson.msg) {
+                                    info = "操作错误：" + respjson.msg
+                                            + " 请修改后再继续提交。";
+                                } else {
+                                    info = "提交时发生异常，请重新尝试。"
+                                }
+                                experiment.disabledBtn("submit", false)
+                            }
+                            experiment.showInfo(info);
+                            progressClose();
+                        },
+                        failure : function(resp, opts) {
+                            experiment.showInfo('服务器端发生错误，请联系老师!');
+                            progressClose();
+                        }
+                    });
+                });
+                return;
             }
         }
 
