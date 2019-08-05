@@ -1,0 +1,153 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.sdkd.ccse</groupId>
+    <artifactId>jsqles_chrome_app</artifactId>
+    <packaging>jar</packaging>
+    <version>1.3.0</version>
+    <name>jsqles chrome app</name>
+    <url>http://shiro.jsqles.net</url>
+
+    <properties>
+        <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+        <jdk.version>1.7</jdk.version>
+        <junit.version>4.12</junit.version>
+        <servlet.version>3.0.1</servlet.version>
+        <log4j2.version>2.8.2</log4j2.version>
+        <spring.version>4.3.8.RELEASE</spring.version>
+        <mybaitsplus.version>2.0.8</mybaitsplus.version>
+        <mysql.version>5.1.40</mysql.version>
+        <druid.version>1.0.29</druid.version>
+        <shiro.version>1.3.2</shiro.version>
+        <ehcache.version>2.6.11</ehcache.version>
+        <jackson.version>2.8.8</jackson.version>
+        <json.version>20160212</json.version>
+        <commons-io.version>2.5</commons-io.version>
+        <commons-fileupload.version>1.3.2</commons-fileupload.version>
+        <hibernate-validator.version>5.3.5.Final</hibernate-validator.version>
+        <poi.version>3.16</poi.version>
+    </properties>
+
+    <dependencies>
+        <!-- test begin -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <!-- test end -->
+
+        <!-- log4j2 begin -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-jcl</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <!-- log4j2 end -->
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>${commons-fileupload.version}</version>
+        </dependency>
+
+        <!-- jackson begin -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!-- jackson end -->
+
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.jtds/jtds -->
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
+        <!-- 若要windows身份验证，需要 sqljdbc_auth.dll 支持-->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>6.4.0.jre7</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>jsqles_chrome_app_host</finalName>
+
+        <plugins>
+
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                         <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>cn.sdkd.ccse.jsqles.chromeapp.host.ChromeAppHost</mainClass>
+                            </manifest>
+                         </archive>
+                    </configuration>
+             </plugin>
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.8</version>
+            <executions>
+                <execution>
+                    <id>copy-dependencies</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>copy-dependencies</goal>
+                        </goals>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+
+    </build>
+
+
+
+    <!-- 使用aliyun镜像 -->
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+
+</project>

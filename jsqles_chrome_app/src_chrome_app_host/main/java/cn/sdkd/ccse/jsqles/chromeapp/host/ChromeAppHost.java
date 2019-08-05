@@ -2,13 +2,18 @@ package cn.sdkd.ccse.jsqles.chromeapp.host;
 
 import cn.sdkd.ccse.jsqles.chromeapp.msgprocessor.ChromeAppMsgProcessor;
 import cn.sdkd.ccse.jsqles.chromeapp.msgprocessor.ChromeAppResponseMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.sql.SQLException;
 
 /** 为chrome扩展程序应用通信的host程序
  * Created by sam on 2019/8/3.
  */
 public class ChromeAppHost {
+    protected static Logger logger = LogManager.getLogger(ChromeAppHost.class);
+
     public static int toInt(byte[] bRefArr) {
         int iOutcome = 0;
         byte bLoop;
@@ -45,22 +50,16 @@ public class ChromeAppHost {
 
     /*工作模式：接收消息-->处理消息-->返回消息*/
     public static void  main(String[] args){
-        FileWriter fileWritter = null;
         InputStream in = System.in;
         byte[] msg_length = new byte[4];
         try {
 
-            fileWritter = new FileWriter("c:\\log.txt",true);
-            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
-            bufferWritter.write("started... ");
-            bufferWritter.newLine();
+//            logger.info("started... ");
 
             in.read(msg_length, 0, 4);
 
             int length = bytesToInt(msg_length);
-
-            bufferWritter.write("length: " + length );
-            bufferWritter.newLine();
+//            logger.info("length: " + length);
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < length; i++)
@@ -69,22 +68,19 @@ public class ChromeAppHost {
             }
             /*获得消息*/
             String msg = sb.toString();
-
-            bufferWritter.write("msg: " + msg);
-            bufferWritter.newLine();
+//            logger.info("msg: " + msg);
 
             ChromeAppMsgProcessor chromeAppMsgProcessor = new ChromeAppMsgProcessor(msg);
-            ChromeAppResponseMessage chromeAppResponseMessage = chromeAppMsgProcessor.process();
-            sendMsg(chromeAppResponseMessage.getJsonMsgText());
-
-
-            bufferWritter.write("msg sended. " + msg);
-            bufferWritter.newLine();
-            bufferWritter.close();
-
+            String respmsg = chromeAppMsgProcessor.process();
+            sendMsg(respmsg);
+            logger.info("msg sended:" + respmsg);
 
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+//            logger.error(e);
+        } catch (SQLException e) {
+//            logger.error(e);
+        } catch (ClassNotFoundException e) {
+//            logger.error(e);
         }
 
 

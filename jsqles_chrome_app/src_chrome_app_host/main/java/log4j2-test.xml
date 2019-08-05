@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="off">
+    <properties>
+        <Property name="console-pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%level] %logger{36} - %msg%n</Property>
+        <property name="error-file">c:/log4j2.log</property>
+    </properties>
+    <Appenders>
+
+        <File name="FileAppender" fileName="${error-file}" >
+            <PatternLayout pattern="${console-pattern}" />
+        </File>
+        <Async name="AsyncAppender">
+            <AppenderRef ref="FileAppender"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+
+        <!-- 业务debug日志 -->
+        <logger name="cn.sdkd.ccse.jsqles.chromeapp" level="DEBUG"/>
+
+        <Root level="debug">
+            <appenderRef ref="AsyncAppender" />
+        </Root>
+
+    </Loggers>
+</Configuration>
