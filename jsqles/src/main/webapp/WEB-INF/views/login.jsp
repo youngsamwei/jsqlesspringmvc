@@ -11,9 +11,7 @@
     <link rel="stylesheet" type="text/css" href="${staticPath }/static/style/css/login.css?v=201612202107" />
     <script type="text/javascript" src="${staticPath }/static/login.js?v=20170118" charset="utf-8"></script>
     <script language="javascript">
-    console.info(self.location);
-    console.info(top.location);
-    console.info(basePath + '/login');
+
     if (top.location.pathname != (basePath + '/login')){
         top.location.href = "/login";
     }

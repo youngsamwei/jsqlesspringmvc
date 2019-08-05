@@ -20,7 +20,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -109,6 +112,21 @@ public class ExperimentController  extends BaseController {
         Question question = questionService.selectById(id);
         Long userid = getUserId();
         List<Exercisebook> exers = exercisebookService.selectList(userid, id);
+
+
+        /*获取浏览器信息*/
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes()).getRequest();
+        String header = request.getHeader("User-Agent");
+        header = (header == null) ? "" : header.toUpperCase();
+
+        if (header.contains("MSIE")) {
+            model.addAttribute("experiment_js_path", "experiment");
+        } else if (header.contains("CHROME")) {
+            model.addAttribute("experiment_js_path", "experiment_chrome");
+        } else {
+            model.addAttribute("experiment_js_path", "experiment");
+        }
 
         boolean started = false;
         boolean solved = false;

@@ -5,7 +5,8 @@
 
 	<script type="text/javascript" src="${staticPath }/static/experiment/experiment.js?2010"></script>
 	<script type="text/javascript" src="${staticPath }/static/experiment/dbmanager.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbmetadata2.js?2"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmetadata2.js?2"></script>
+
 
 <script type="text/javascript">
 

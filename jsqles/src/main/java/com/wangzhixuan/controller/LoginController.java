@@ -24,6 +24,8 @@ import com.wangzhixuan.commons.base.BaseController;
 import com.wangzhixuan.commons.csrf.CsrfToken;
 import com.wangzhixuan.commons.shiro.captcha.DreamCaptcha;
 import com.wangzhixuan.commons.utils.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * @description：登录退出
@@ -58,16 +60,19 @@ public class LoginController extends BaseController {
     public String index(Model model) {
         SchoolyeartermVO schoolyearterm = schoolyeartermService.selectCurrentSchoolyearterm();
         /*当前日期不属于任何学期时的异常处理*/
-        if (schoolyearterm == null){
+        if (schoolyearterm == null) {
             schoolyearterm = new SchoolyeartermVO();
             schoolyearterm.setTermid(-1L);
         }
         model.addAttribute("currentTerm", schoolyearterm);
+
+
         return "index";
     }
 
     /**
      * GET 登录
+     *
      * @return {String}
      */
     @GetMapping("/login")
@@ -91,8 +96,8 @@ public class LoginController extends BaseController {
     @CsrfToken(remove = true)
     @ResponseBody
     public Object loginPost(HttpServletRequest request, HttpServletResponse response,
-            String username, String password, String captcha, 
-            @RequestParam(value = "rememberMe", defaultValue = "0") Integer rememberMe) {
+                            String username, String password, String captcha,
+                            @RequestParam(value = "rememberMe", defaultValue = "0") Integer rememberMe) {
         logger.info("POST请求登录");
         // 改为全部抛出异常，避免ajax csrf token被刷新
         if (StringUtils.isBlank(username)) {
@@ -127,6 +132,7 @@ public class LoginController extends BaseController {
 
     /**
      * 未授权
+     *
      * @return {String}
      */
     @GetMapping("/unauth")
@@ -139,6 +145,7 @@ public class LoginController extends BaseController {
 
     /**
      * 未授权
+     *
      * @return {String}
      */
     @GetMapping("/denied")
@@ -148,6 +155,7 @@ public class LoginController extends BaseController {
 
     /**
      * 被踢出后转向的页面,嵌入式的登录页面
+     *
      * @return {String}
      */
     @GetMapping("/enlogin")
@@ -157,6 +165,7 @@ public class LoginController extends BaseController {
 
     /**
      * 退出
+     *
      * @return {Result}
      */
     @PostMapping("/logout")
