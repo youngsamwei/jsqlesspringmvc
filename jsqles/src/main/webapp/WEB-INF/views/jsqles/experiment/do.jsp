@@ -121,9 +121,9 @@
                         </tr>
                         <tr >
                             <th></th>
-                            <td style="height:30%;">
-                            <div id="sql_tr_textarea" >
-                                <textarea  id="editSQLForm_textarea"  style="height:100%;width:100%" value="">${postext}</textarea>
+                            <td style="height:100%;">
+                            <div id="sql_tr_textarea"  style="overflow-y:scroll;height:100%" >
+                                <textarea  id="editSQLForm_textarea"  style="height:95%;width:98%" value="">${postext}</textarea>
                                 </div>
                             </td>
                         </tr>

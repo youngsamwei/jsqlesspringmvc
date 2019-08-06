@@ -15,6 +15,7 @@ import java.sql.*;
 public class ChromeAppMsgProcessor {
     protected Logger logger = LogManager.getLogger(ChromeAppMsgProcessor.class);
     String driver_class = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    /*如何连接上sqlexpress实例?*/
     String conn_str = "jdbc:sqlserver://localhost:1433;IntegratedSecurity=true;";
 
     private ChromeAppRequestMessage caMsg;
