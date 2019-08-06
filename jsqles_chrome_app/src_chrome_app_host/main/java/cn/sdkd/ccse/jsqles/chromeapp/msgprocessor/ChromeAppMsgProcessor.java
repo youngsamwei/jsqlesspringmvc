@@ -181,7 +181,7 @@ public class ChromeAppMsgProcessor {
         Class.forName(driver_class);
         Connection con = null;
 
-        String response = "{\"success\":true}";
+        String response = "{\"success\":false}";
         if (this.caMsg != null) {
             if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.query) {
                  con = DriverManager.getConnection(conn_str + "DatabaseName=" + caMsg.getDbname() + ";");

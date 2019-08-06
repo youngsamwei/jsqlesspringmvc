@@ -156,8 +156,8 @@ experiment.init = function( ) {
                         experiment.successHandler();
                         progressClose();
                     } else {
-                        console.info(sqls[v]);
-                        setTimeout(exeSql(v + 1), 200);
+//                        console.info(sqls[v]);
+                        setTimeout(exeSql(v + 1), 50);
                     }
 				});
 
@@ -176,10 +176,10 @@ experiment.init = function( ) {
 		try {
 			/* 初始化数据库 */
 			dbmetadata2.initDB(quesPreq, function(r){
-			    console.info("initDB_callback：" + sqls);
+//			    console.info("initDB_callback：" + sqls);
                 /* 再初始化数据表，数据，约束 */
                 if (sqls.length > 0) {
-                    setTimeout(exeSql(0), 200);
+                    setTimeout(exeSql(0), 50);
                 } else {
                     experiment.showInfo(infotext);
                     experiment.successHandler();
@@ -255,7 +255,14 @@ experiment.createSQLText = function(quesPreq) {
  */
 experiment.submitsql = "";
 experiment.submit_callback = function(quesid, dbtree, postext, resultset){
-
+        if (resultset.success){
+        }else{
+            var info = resultset.msg;
+            experiment.showInfo(info);
+            progressClose();
+            experiment.disabledBtn("submit", false);
+            return;
+        }
         /*使用JSON.stringify会把汉字转换为unicode，所以使用eval再变为汉字
         http://blog.csdn.net/yefengmeander/article/details/45192565
         */

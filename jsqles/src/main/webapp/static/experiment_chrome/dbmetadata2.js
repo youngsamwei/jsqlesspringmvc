@@ -366,10 +366,8 @@ dbmetadata2.initDB = function(quesPreq, initdb_callback) {
 	var database = quesPreq.database[0];
 	if (database && database.name) {
         var request = {requestType: "initdb", dbname:database.name};
-        console.info(request);
         chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
           function(json_resultset) {
-            console.info(json_resultset);
             initdb_callback(json_resultset);
         });
 	}

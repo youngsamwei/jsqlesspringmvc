@@ -6,12 +6,28 @@ package cn.sdkd.ccse.jsqles.chromeapp.msgprocessor;
  */
 public class ChromeAppResponseMessage {
 
-    public ChromeAppResponseMessage(){
+    private boolean success;
+    private String msg;
 
+    public ChromeAppResponseMessage(boolean success, String msg) {
+        this.success = success;
+        this.msg = msg;
     }
 
-    /*获得json格式的消息文本*/
-    public String getJsonMsgText(){
-        return "";
+    public boolean isSuccess() {
+        return success;
     }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
 }
