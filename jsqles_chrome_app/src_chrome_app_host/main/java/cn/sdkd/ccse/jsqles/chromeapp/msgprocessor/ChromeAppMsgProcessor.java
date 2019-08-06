@@ -16,7 +16,7 @@ public class ChromeAppMsgProcessor {
     protected Logger logger = LogManager.getLogger(ChromeAppMsgProcessor.class);
     String driver_class = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     /*如何连接上sqlexpress实例?*/
-    String conn_str = "jdbc:sqlserver://localhost:1433;IntegratedSecurity=true;";
+    String conn_str = "jdbc:sqlserver://localhost:1533;IntegratedSecurity=true;instance=./sqlexpress;";
 
     private ChromeAppRequestMessage caMsg;
 
@@ -100,14 +100,14 @@ public class ChromeAppMsgProcessor {
     private void killspid(Connection con) throws SQLException {
         notExistCreateKillspid(con);
 
-        String sql = "exec master..killspid '" + caMsg.getDbname() + "'";
+        String sql = "exec killspid '" + caMsg.getDbname() + "'";
         con.createStatement().execute(sql);
     }
 
     /*断开数据的所有连接，否则删除时报异常*/
     private void notExistCreateKillspid(Connection con) throws SQLException {
-        String killspid = "master..killspid";
-        String sql = "create proc "
+        String killspid = "killspid";
+        String sql = " create proc "
                 + killspid
                 + " (@dbname varchar(20)) "
                 + " as "
@@ -115,7 +115,7 @@ public class ChromeAppMsgProcessor {
                 + " declare @sql nvarchar(500); "
                 + " declare @spid int; "
                 + " set @sql='declare getspid cursor for select spid ' "
-                + " + 'from master..sysprocesses where dbid in (select dbid from master..sysdatabases where name=''' +@dbname+''' )'; "
+                + " + 'from sysprocesses where dbid in (select dbid from sysdatabases where name=''' +@dbname+''' )'; "
                 + " exec(@sql); " + " open getspid ;"
                 + " fetch next from getspid into @spid; "
                 + " while @@fetch_status = 0 " + " begin "
@@ -123,6 +123,8 @@ public class ChromeAppMsgProcessor {
                 + " fetch next from getspid into @spid " + " end ;"
                 + " close getspid; " + " deallocate getspid; " + " end; ";
 
+        String c = "DECLARE @Sql NVARCHAR(max);SELECT @Sql=' KILL '+RTRIM(spid)+';' FROM sys.sysprocesses WHERE dbid=DB_ID('DB') AND spid<>@@SPID;" +
+                " EXEC(@Sql)";
         String existprocsql = "select object_id('" + killspid + "') as name;";
         ResultSet rs = con.createStatement().executeQuery(existprocsql);
 

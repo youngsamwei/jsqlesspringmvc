@@ -169,7 +169,7 @@ experiment.init = function( ) {
 		try {
 			/* 初始化数据库 */
 			dbmetadata2.initDB(quesPreq, function(r){
-			    console.info("initDB_callback");
+			    console.info("initDB_callback：" + sqls);
                 /* 再初始化数据表，数据，约束 */
                 if (sqls.length > 0) {
                     setTimeout(exeSql(0), 100);
