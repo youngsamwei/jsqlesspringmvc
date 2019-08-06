@@ -81,6 +81,7 @@ public class ChromeAppMsgProcessor {
 
     public String execute(Connection con) throws ClassNotFoundException, SQLException {
         String response = "{\"success\":true}";
+        logger.info(caMsg.getSqlText());
         con.createStatement().execute(caMsg.getSqlText());
         return response;
     }

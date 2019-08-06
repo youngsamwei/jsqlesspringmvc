@@ -144,13 +144,20 @@ experiment.init = function( ) {
 		return function() {
 			try {
 				/* 再初始化数据表，数据，约束 */
-				dbmetadata2.execute(sqls[v], db, function(){
+				var sql = sqls[v];
+				/*出现空语句，需要处理异常*/
+				if (sql == ""){
+				    setTimeout(exeSql(v + 1), 200);
+				    return;
+				}
+				dbmetadata2.execute(sql, db, function(){
                     if (v == (sqls.length - 1)) {
                         experiment.showInfo("初始化数据库完成." + infotext)
                         experiment.successHandler();
                         progressClose();
                     } else {
-                        setTimeout(exeSql(v + 1), 100);
+                        console.info(sqls[v]);
+                        setTimeout(exeSql(v + 1), 200);
                     }
 				});
 
@@ -172,7 +179,7 @@ experiment.init = function( ) {
 			    console.info("initDB_callback：" + sqls);
                 /* 再初始化数据表，数据，约束 */
                 if (sqls.length > 0) {
-                    setTimeout(exeSql(0), 100);
+                    setTimeout(exeSql(0), 200);
                 } else {
                     experiment.showInfo(infotext);
                     experiment.successHandler();
