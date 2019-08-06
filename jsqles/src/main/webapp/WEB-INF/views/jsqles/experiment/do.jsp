@@ -4,7 +4,7 @@
 <%@ include file="/commons/global.jsp" %>
 
 	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/experiment.js?2010"></script>
-	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }experiment/dbmanager.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmanager.js"></script>
 	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmetadata2.js?2"></script>
 
 

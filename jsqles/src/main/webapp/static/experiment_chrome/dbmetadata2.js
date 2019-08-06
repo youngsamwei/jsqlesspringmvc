@@ -323,14 +323,14 @@ dbmetadata2.query = function(sql) {
 }
 
 /*在chrome中采用扩展实现*/
-dbmetadata2.query = function(sql, dbname, submit_callback) {
+dbmetadata2.query = function(sql, dbname, quesid, dbtree, postext, submit_callback) {
 	if (sql) {
         var jsqlesChromeExtensionId = "oeejofojochggegmkbmjbjhiojakbcme";
         var request = {requestType: "query", dbname:dbname, sqlText:sql};
         chrome.runtime.sendMessage(jsqlesChromeExtensionId, request,
           function(response) {
-            console.log("response: " + JSON.stringify(response));
-            submit_callback(response);
+//            console.log("response: " + JSON.stringify(response));
+            submit_callback(quesid, dbtree, postext, response);
             return ;
         });
 

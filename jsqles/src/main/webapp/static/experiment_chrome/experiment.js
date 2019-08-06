@@ -265,112 +265,7 @@ experiment.initDB = function(quesPreq) {
  * 获取本地数据库中指定对象的详细信息。
  */
 experiment.submitsql = "";
-experiment.submit = function( ) {
-
-    progressLoad();
-    var quesid = this.quesid;
-    var quesRequiredb = this.quesRequiredb;
-    var ifpostext = this.ifpostext;
-    var resultquery = this.resultquery;
-//    var db = this.db;
-    var db = this.quesPreq ? this.quesPreq.database[0].name : null;
-	experiment.disabledBtn("submit", true);
-	/*
-	 * 验证的过程： 1）若需要进行结构验证，则将dbtree提交至服务器进行结构比较。
-	 *  2）若需要进行结果验证，则先判断答案代码类型
-	 * 2.1）若是select类型，则使用用户提交的代码获取数据提交至服务器进行数据验证；
-	 * 2.2）若是其他类型，则使用教师提交的代码获取数据提交至服务器进行数据验证；
-	 *
-	 */
-
-    try {
-        /* 获取结构数据 */
-        var dbtree = null;
-         var resultset = null;
-
-        if (ifpostext){
-            var postext = $('#editSQLForm_textarea').val();
-            if (postext == "") {
-                  throw {name:"错误", message:"需要提交代码！"}
-            }
-        }
-        if (quesRequiredb) {/* 结构验证*/
-            dbtree = dbmetadata2.getRequiredDBTree(quesRequiredb);
-        }else{/*结果验证*/
-            /*用户提交的代码，但有些题目不需要用户提交代码*/
-            var postext = $('#editSQLForm_textarea').val();
-
-            /* 获取结果数据 */
-            if (!resultquery) {
-                resultquery = postext;
-            }
-
-            if (typeof (resultquery) == "string" && resultquery.length > 0) {
-                dbmetadata2.query(resultquery, db, function(resultset){
-                    /*使用JSON.stringify会把汉字转换为unicode，所以使用eval再变为汉字
-                    http://blog.csdn.net/yefengmeander/article/details/45192565
-                    */
-
-                    /* 使用json2不对汉字转换为unicode，因此不必使用eval */
-                    var jsonstr_dbtree = JSON2.stringify(dbtree);
-                    var encodeAnswer = jsonstr_dbtree;
-            //        eval("var encodeAnswer = '"+ jsonstr_dbtree + "';");
-            /*20180714 使用eval时，在创建default的语句中包含单引号，因此提示缺少分号，现在已经不是用eval，因此已经没有这个错误*/
-
-                    var jsonstr_resultset = JSON2.stringify(resultset);
-                    var encodeResultset = jsonstr_resultset;
-            //        eval("var encodeResultset = '"+ jsonstr_resultset +"';");
-                    $.ajax({
-                        type: 'POST',
-                        dataType : 'json',
-                        url : '/experiment/submit',
-                        data : {
-                            "quesid" : quesid,
-                            "answer" : encodeAnswer, /* 用于结构验证的操作结果 */
-                            "postext" : postext, /* 用户提交的代码，有些题目不需要用户提交代码。结构验证将来可能也需要用户提交代码。 */
-                            "resultset" : encodeResultset
-                        },
-                        success : function(msg) {
-                            var respjson = [];
-                            try {
-                                if (!msg || msg.length == 0) {
-                                    respjson = [];
-                                } else if (typeof msg == "string") {
-                                    respjson = eval("(" + msg + ")");
-                                } else {
-                                    respjson = msg;
-                                }
-                            } catch (err) {
-                                respjson = msg;
-                            }
-                            var info = "";
-                            if (respjson.success) {
-                                info = "操作正确。";
-                                experiment.disabledBtn("submit", true);
-                                $('#btn_init').hide();
-                                $('#submit').hide();
-                                $('#start').hide();
-                            } else {
-                                if (respjson.msg) {
-                                    info = "操作错误：" + respjson.msg
-                                            + " 请修改后再继续提交。";
-                                } else {
-                                    info = "提交时发生异常，请重新尝试。"
-                                }
-                                experiment.disabledBtn("submit", false)
-                            }
-                            experiment.showInfo(info);
-                            progressClose();
-                        },
-                        failure : function(resp, opts) {
-                            experiment.showInfo('服务器端发生错误，请联系老师!');
-                            progressClose();
-                        }
-                    });
-                });
-                return;
-            }
-        }
+experiment.submit_callback = function(quesid, dbtree, postext, resultset){
 
         /*使用JSON.stringify会把汉字转换为unicode，所以使用eval再变为汉字
         http://blog.csdn.net/yefengmeander/article/details/45192565
@@ -432,6 +327,55 @@ experiment.submit = function( ) {
                 progressClose();
             }
         });
+
+}
+
+experiment.submit = function( ) {
+
+    progressLoad();
+    var quesid = this.quesid;
+    var quesRequiredb = this.quesRequiredb;
+    var ifpostext = this.ifpostext;
+    var resultquery = this.resultquery;
+//    var db = this.db;
+    var db = this.quesPreq ? this.quesPreq.database[0].name : null;
+	experiment.disabledBtn("submit", true);
+	/*
+	 * 验证的过程： 1）若需要进行结构验证，则将dbtree提交至服务器进行结构比较。
+	 *  2）若需要进行结果验证，则先判断答案代码类型
+	 * 2.1）若是select类型，则使用用户提交的代码获取数据提交至服务器进行数据验证；
+	 * 2.2）若是其他类型，则使用教师提交的代码获取数据提交至服务器进行数据验证；
+	 *
+	 */
+
+    try {
+        /* 获取结构数据 */
+        var dbtree = null;
+         var resultset = null;
+
+        if (ifpostext){
+            var postext = $('#editSQLForm_textarea').val();
+            if (postext == "") {
+                  throw {name:"错误", message:"需要提交代码！"}
+            }
+        }
+        if (quesRequiredb) {/* 结构验证*/
+            dbtree = dbmetadata2.getRequiredDBTree(quesRequiredb);
+            experiment.submit_callback(quesid, dbtree, postext, resultset);
+        }else{/*结果验证*/
+            /*用户提交的代码，但有些题目不需要用户提交代码*/
+            var postext = $('#editSQLForm_textarea').val();
+
+            /* 获取结果数据 */
+            if (!resultquery) {
+                resultquery = postext;
+            }
+
+            if (typeof (resultquery) == "string" && resultquery.length > 0) {
+                dbmetadata2.query(resultquery, db, quesid, dbtree, postext, experiment.submit_callback);
+            }
+        }
+
     } catch (e) {
         experiment.disabledBtn("submit", false);
         experiment.showInfo(e.name + ":" + e.message);
