@@ -50,6 +50,7 @@ public class ChromeAppHost {
 
     /*工作模式：接收消息-->处理消息-->返回消息*/
     public static void  main(String[] args){
+        String response =  "{\"success\":false}";
         InputStream in = System.in;
         byte[] msg_length = new byte[4];
         try {
@@ -76,13 +77,27 @@ public class ChromeAppHost {
             logger.info("msg sended:" + respmsg);
 
         } catch (IOException e) {
-//            logger.error(e);
+            try {
+                logger.error(e);
+                sendMsg(response);
+            } catch (IOException e1) {
+                logger.error(e1);
+            }
         } catch (SQLException e) {
-//            logger.error(e);
+            try {
+                logger.error(e);
+                sendMsg(response);
+            } catch (IOException e1) {
+                logger.error(e1);
+            }
         } catch (ClassNotFoundException e) {
-//            logger.error(e);
+            try {
+                logger.error(e);
+                sendMsg(response);
+            } catch (IOException e1) {
+                logger.error(e1);
+            }
         }
-
 
     }
 }

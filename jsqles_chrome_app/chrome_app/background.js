@@ -98,21 +98,20 @@ chrome.runtime.onMessageExternal.addListener(
   function(request, sender, sendResponse) {
 //    console.log("chrome.runtime.onMessageExternal.addListener in background.js");
 
-        if (request.data){
-            if (request.data == "connect"){
-                connect();
-                return;
-            }
-        }
-      	if(port==null)	{
+//        if (request.data){
+//            if (request.data == "connect"){
+//                connect();
+//                return;
+//            }
+//        }
+//      	if(port==null)	{
             connect();
-        }
+//        }
         /*保存web页面传递的response处理函数*/
         rsp = sendResponse;
 //        message = {"requestType":"query", "dbname":"testdb", "sqlText": request.sqlText};
         port.postMessage(request);
 //        console.log("Hi, there is message ["+data+"]from the website");
-
 
       return true;
   });

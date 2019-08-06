@@ -14,13 +14,16 @@ import java.sql.*;
  */
 public class ChromeAppMsgProcessor {
     protected Logger logger = LogManager.getLogger(ChromeAppMsgProcessor.class);
+    String driver_class = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    String conn_str = "jdbc:sqlserver://localhost:1433;IntegratedSecurity=true;";
 
     private ChromeAppRequestMessage caMsg;
 
-    public ChromeAppMsgProcessor(ChromeAppRequestMessage msg){
+    public ChromeAppMsgProcessor(ChromeAppRequestMessage msg) {
         this.caMsg = msg;
     }
-    public ChromeAppMsgProcessor(String msg){
+
+    public ChromeAppMsgProcessor(String msg) {
         ObjectMapper objectMapper = new ObjectMapper();
         ChromeAppRequestMessage chromeAppRequestMessage = null;
         try {
@@ -34,54 +37,167 @@ public class ChromeAppMsgProcessor {
 
     }
 
+    public String query(Connection con) throws SQLException, ClassNotFoundException {
+        String response = "{\"success\":false}";
+        Statement stmt = con.createStatement();//创建Statement
+        ResultSet rs = stmt.executeQuery(caMsg.getSqlText());
+
+        response = "[";
+        while (rs.next()) {
+            String l = "{";
+                        /*mssql resultset的下标从1开始*/
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                l += "\"" + rs.getMetaData().getColumnName(i) + "\"";
+                l += ":";
+                int dataType = rs.getMetaData().getColumnType(i);
+                if (dataType == -7  //bit
+                        || dataType == -6  //tinyint
+                        || dataType == -5  //bigint
+                        || dataType == 2   //numeric
+                        || dataType == 3   //decimal
+                        || dataType == 4   //integer
+                        || dataType == 5   //smallint
+                        || dataType == 6   //float
+                        || dataType == 7   //real
+                        || dataType == 8   /*double*/) {
+                    l += rs.getString(i);
+                } else {
+                    l += "\"" + rs.getString(i) + "\"";
+                }
+                if (i < rs.getMetaData().getColumnCount()) {
+                    l += ",";
+                }
+            }
+
+            l += "},";
+            response += l;
+        }
+        response = response.substring(0, response.length() - 1) + "]";
+        rs.close();
+        stmt.close();
+        return response;
+    }
+
+    public String execute(Connection con) throws ClassNotFoundException, SQLException {
+        String response = "{\"success\":true}";
+        con.createStatement().execute(caMsg.getSqlText());
+        return response;
+    }
+
+    /*逐句执行sql语句*/
+    public String executeOnebyOne(Connection con) throws ClassNotFoundException, SQLException {
+        String response = "{\"success\":true}";
+        con.createStatement().execute(caMsg.getSqlText());
+        return response;
+    }
+
+    private void dropdb(Connection con) throws SQLException {
+        String sql = "drop database " + caMsg.getDbname();
+        con.createStatement().execute(sql);
+    }
+
+    private void killspid(Connection con) throws SQLException {
+        notExistCreateKillspid(con);
+
+        String sql = "exec master..killspid '" + caMsg.getDbname() + "'";
+        con.createStatement().execute(sql);
+    }
+
+    /*断开数据的所有连接，否则删除时报异常*/
+    private void notExistCreateKillspid(Connection con) throws SQLException {
+        String killspid = "master..killspid";
+        String sql = "create proc "
+                + killspid
+                + " (@dbname varchar(20)) "
+                + " as "
+                + " begin "
+                + " declare @sql nvarchar(500); "
+                + " declare @spid int; "
+                + " set @sql='declare getspid cursor for select spid ' "
+                + " + 'from master..sysprocesses where dbid in (select dbid from master..sysdatabases where name=''' +@dbname+''' )'; "
+                + " exec(@sql); " + " open getspid ;"
+                + " fetch next from getspid into @spid; "
+                + " while @@fetch_status = 0 " + " begin "
+                + " IF  @spid <> @@SPID " + "   exec('kill '+@spid); "
+                + " fetch next from getspid into @spid " + " end ;"
+                + " close getspid; " + " deallocate getspid; " + " end; ";
+
+        String existprocsql = "select object_id('" + killspid + "') as name;";
+        ResultSet rs = con.createStatement().executeQuery(existprocsql);
+
+        boolean ifExist = false;
+        if (rs.next()) {
+            ifExist = rs.getString("name") != null;
+        }
+        rs.close();
+        if (!ifExist) {
+		/* 该存储过程不存在，则创建 */
+            con.createStatement().execute(sql);
+        }
+    }
+
+    private void createdb(Connection con) throws SQLException {
+        String sql = "create database " + caMsg.getDbname();
+        con.createStatement().execute(sql);
+    }
+
+    public String initdb(Connection con) throws ClassNotFoundException, SQLException {
+        String response = "{\"success\":true}";
+
+        String dbname = caMsg.getDbname();
+        logger.info(caMsg.getDbname());
+        ResultSet rs = con.createStatement().executeQuery("select name from master.dbo.sysdatabases where [name]='"
+                + dbname + "'");
+        if (rs != null){
+            if (rs.next()) {
+                String name = rs.getString("name");
+                killspid(con);
+                dropdb(con);
+                logger.info("dropdb db.");
+            }
+            createdb(con);
+            logger.info("create db.");
+        }else{
+            response = "{\"success\":false}";
+        }
+        rs.close();
+
+        return response;
+    }
+
+    public String help(Connection con) {
+        String response = "{\"success\":true}";
+
+        return response;
+    }
+
     /*注意：chrome要求的json格式严格*/
     public String process() throws SQLException, ClassNotFoundException {
 
-        String response = "";
-        if (this.caMsg != null){
-            if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.query){
-                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                    Connection con = DriverManager.getConnection( "jdbc:sqlserver://localhost:1433;instance=sqlexpress;DatabaseName="
-                            + caMsg.getDbname() + ";IntegratedSecurity=true;");
-                    Statement stmt = con.createStatement();//创建Statement
-                    ResultSet rs = stmt.executeQuery(caMsg.getSqlText());
+        Class.forName(driver_class);
+        Connection con = null;
 
-                    response = "[";
-                    while (rs.next()) {
-                        String l = "{";
-                        /*mssql resultset的下标从1开始*/
-                        for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                            l += "\"" + rs.getMetaData().getColumnName(i) + "\"";
-                            l += ":";
-                            int dataType = rs.getMetaData().getColumnType(i);
-                            if (dataType == -7  //bit
-                                    || dataType == -6  //tinyint
-                                    || dataType == -5  //bigint
-                                    || dataType == 2   //numeric
-                                    || dataType == 3   //decimal
-                                    || dataType == 4   //integer
-                                    || dataType == 5   //smallint
-                                    || dataType == 6   //float
-                                    || dataType == 7   //real
-                                    || dataType == 8   /*double*/){
-                                l += rs.getString(i);
-                            }else {
-                                l += "\"" + rs.getString(i) + "\"";
-                            }
-                            if (i < rs.getMetaData().getColumnCount()) {
-                                l += ",";
-                            }
-                        }
-
-                        l += "},";
-                        response += l;
-                    }
-                    response = response.substring(0, response.length() - 1) + "]";
-                    rs.close();
-                    stmt.close();
-                    con.close();
-
+        String response = "{\"success\":true}";
+        if (this.caMsg != null) {
+            if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.query) {
+                 con = DriverManager.getConnection(conn_str + "DatabaseName=" + caMsg.getDbname() + ";");
+                response = query(con);
+            } else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.execute) {
+                 con = DriverManager.getConnection(conn_str + "DatabaseName=" + caMsg.getDbname() + ";");
+                response = execute(con);
+            } else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.initdb) {
+                 con  = DriverManager.getConnection(conn_str + "DatabaseName=master;");
+                response = initdb(con);
+            } else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.help) {
+                 con = DriverManager.getConnection(conn_str + "DatabaseName=" + caMsg.getDbname() + ";");
+                response = help(con);
+            } else {
+                response = "{\"success\":false}";
             }
+        }
+
+        if (con != null) {
+            con.close();
         }
         return response;
     }

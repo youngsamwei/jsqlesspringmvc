@@ -45,7 +45,7 @@ L = 日志
  * 
  * */
 var dbmetadata2 = {};
-
+dbmetadata2.jsqlesChromeExtensionId = "oeejofojochggegmkbmjbjhiojakbcme";
 dbmetadata2.defaultDBName = "TestDB";
 dbmetadata2.dataMaxSize = 20;
 dbmetadata2.initConnection = function(dbname) {
@@ -325,12 +325,12 @@ dbmetadata2.query = function(sql) {
 /*在chrome中采用扩展实现*/
 dbmetadata2.query = function(sql, dbname, quesid, dbtree, postext, submit_callback) {
 	if (sql) {
-        var jsqlesChromeExtensionId = "oeejofojochggegmkbmjbjhiojakbcme";
+
         var request = {requestType: "query", dbname:dbname, sqlText:sql};
-        chrome.runtime.sendMessage(jsqlesChromeExtensionId, request,
-          function(response) {
+        chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
+          function(json_resultset) {
 //            console.log("response: " + JSON.stringify(response));
-            submit_callback(quesid, dbtree, postext, response);
+            submit_callback(quesid, dbtree, postext, json_resultset);
             return ;
         });
 
@@ -339,20 +339,41 @@ dbmetadata2.query = function(sql, dbname, quesid, dbtree, postext, submit_callba
 	}
 }
 
+
 dbmetadata2.execute = function(sql) {
 	if (sql) {
-		this.initConnection();
-		this.objdbConn.Execute(sql);
-		this.closeConnection();
+        var request = {requestType: "execute", dbname:this.defaultDBName, sqlText:sql};
+        chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
+          function(json_resultset) {
+//            console.log("response: " + JSON.stringify(response));
+            submit_callback(json_resultset);
+            return ;
+        });
 	}
 }
 
-dbmetadata2.execute = function(sql, dbname) {
+dbmetadata2.execute = function(sql, dbname, execute_callback) {
 	if (sql) {
-		this.initConnection(dbname);
-		this.objdbConn.Execute(sql);
-		this.closeConnection();
+        var request = {requestType: "execute", dbname:dbname, sqlText:sql};
+        chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
+          function(json_resultset) {
+            execute_callback(json_resultset);
+        });
 	}
+}
+
+dbmetadata2.initDB = function(quesPreq, initdb_callback) {
+	var database = quesPreq.database[0];
+	if (database && database.name) {
+        var request = {requestType: "initdb", dbname:database.name};
+        console.info(request);
+        chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
+          function(json_resultset) {
+            console.info(json_resultset);
+            initdb_callback(json_resultset);
+        });
+	}
+
 }
 
 dbmetadata2.post_process_foreignkey = function(cons) {

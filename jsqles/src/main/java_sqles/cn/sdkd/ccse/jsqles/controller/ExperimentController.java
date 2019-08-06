@@ -114,7 +114,7 @@ public class ExperimentController  extends BaseController {
         List<Exercisebook> exers = exercisebookService.selectList(userid, id);
 
 
-        /*获取浏览器信息*/
+        /*获取浏览器信息，在ie中采用activex访问本地数据库，在chrome中采用native messaging访问本地数据库*/
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
                 .getRequestAttributes()).getRequest();
         String header = request.getHeader("User-Agent");

@@ -26,4 +26,18 @@ public class ChromeAppMsgProcessorTest {
         }
 
     }
+
+    @Test
+    public  void testInitdb(){
+        String msg = "{\"requestType\":\"initdb\",\"dbname\":\"testdb\",\"sqlText\":\"select * from student\"}";
+        ChromeAppMsgProcessor chromeAppMsgProcessor = new ChromeAppMsgProcessor(msg);
+        try {
+            String response = chromeAppMsgProcessor.process();
+            logger.info(response);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }

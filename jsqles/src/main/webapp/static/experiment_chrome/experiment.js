@@ -144,22 +144,18 @@ experiment.init = function( ) {
 		return function() {
 			try {
 				/* 再初始化数据表，数据，约束 */
-				dbmetadata2.execute(sqls[v], db);
+				dbmetadata2.execute(sqls[v], db, function(){
+                    if (v == (sqls.length - 1)) {
+                        experiment.showInfo("初始化数据库完成." + infotext)
+                        experiment.successHandler();
+                        progressClose();
+                    } else {
+                        setTimeout(exeSql(v + 1), 100);
+                    }
+				});
 
-				if (v == (sqls.length - 1)) {
-					experiment.showInfo("初始化数据库完成." + infotext)
-
-					experiment.successHandler();
-
-					dbmetadata2.closeConnection();
-					progressClose();
-
-				} else {
-					setTimeout(exeSql(v + 1), 100);
-				}
 			} catch (e) {
 				experiment.showInfo(e.name + " : " + e.message);
-				dbmetadata2.closeConnection();
 
 				experiment.errorHandler(e.name + " : " + e.message);
 				progressClose();
@@ -172,19 +168,19 @@ experiment.init = function( ) {
         experiment.showInfo("正在初始化数据库...");
 		try {
 			/* 初始化数据库 */
-			experiment.initDB(quesPreq);
-			/* 再初始化数据表，数据，约束 */
-			if (sqls.length > 0) {
-				setTimeout(exeSql(0), 100);
-			} else {
-				experiment.showInfo(infotext);
-				experiment.successHandler();
-				progressClose();
-			}
+			dbmetadata2.initDB(quesPreq, function(r){
+			    console.info("initDB_callback");
+                /* 再初始化数据表，数据，约束 */
+                if (sqls.length > 0) {
+                    setTimeout(exeSql(0), 100);
+                } else {
+                    experiment.showInfo(infotext);
+                    experiment.successHandler();
+                    progressClose();
+                }
+			});
 
 		} catch (e) {
-
-			dbmanager.closeMasterConnection();
 
 			experiment.errorHandler(e.name, e.message);
 			progressClose();
@@ -243,20 +239,6 @@ experiment.createSQLText = function(quesPreq) {
 		}
 	}
 	return sqls;
-}
-
-experiment.initDB = function(quesPreq) {
-	dbmanager.initMasterConnection();
-	var database = quesPreq.database[0];
-	if (database && database.name) {
-		if (dbmanager.existDB(database.name)) {
-			var rs = dbmanager.killspid(database.name);
-			dbmanager.dropDB(database.name);
-		}
-		dbmanager.createDB(database.name);
-	}
-	dbmanager.closeMasterConnection();
-
 }
 
 /*

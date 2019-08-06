@@ -5,67 +5,6 @@
 
 var dbmanager = {};
 
-dbmanager.isexpress = true;
-
-/* */
-dbmanager.initMasterConnection = function() {
-	var objMasterConn = new ActiveXObject("ADODB.Connection");
-	var strdsn = "";
-	if (this.isexpress) {
-		strdsn = "Integrated Security=SSPI;Provider=SQLOLEDB.1;Data Source=.\\sqlexpress;Initial Catalog=master";
-	} else {
-		strdsn = "Driver={SQL Server};SERVER=(local);DATABASE=master";
-	}
-
-	objMasterConn.Open(strdsn);
-	this.objMasterConn = objMasterConn;
-}
-
-dbmanager.closeMasterConnection = function() {
-	if (this.objMasterConn && this.objMasterConn.State != 0) {
-		this.objMasterConn.close();
-	}
-}
-
-/* 默认数据库怎么不起作用呢？在执行判别sql语句时提示无效的borrow对象*/
-dbmanager.initConnection = function(dbname) {
-	this.objdbConn = new ActiveXObject("ADODB.Connection");
-	var strdsn = "";
-	if (this.isexpress) {
-		strdsn = "Integrated Security=SSPI;Provider=SQLOLEDB.1;Data Source=.\\sqlexpress;Initial Catalog=" + dbname;
-	} else {
-		strdsn = "Driver={SQL Server};SERVER=(local);DATABASE=" + dbname;
-	}	
-
-	this.objdbConn.Open(strdsn);
-	return this.objdbConn && this.objdbConn.State != 0;
-}
-
-dbmanager.closeConnection = function() {
-	if (this.objdbConn && this.objdbConn.State != 0) {
-		this.objdbConn.close();
-	}
-}
-
-dbmanager.dropDB = function(dbname) {
-	var sql = "drop database " + dbname;
-	var r = this.objMasterConn.Execute(sql);
-}
-
-dbmanager.createDB = function(dbname) {
-	var sql = "create database " + dbname;
-	var r = this.objMasterConn.Execute(sql);
-}
-
-dbmanager.existDB = function(dbname) {
-	var sql = "select name from master.dbo.sysdatabases where [name]='"
-			+ dbname + "'";
-	var rs = this.objMasterConn.Execute(sql);
-	if ((rs != null) && (!rs.EOF)) {
-		return true
-	}
-	return false;
-}
 
 dbmanager.sp_helpdb = function(database_name) {
 	var sql = "exec sp_helpdb '" + database_name + "'";
@@ -111,47 +50,6 @@ dbmanager.getColumnList = function(table) {
 	return cl;
 }
 
-/* 检查存储过程killspid是否存在，若不存在则创建一个 */
-dbmanager.notExistCreateKillspid = function() {
-	var killspid = "killspid";
-	var sql = "create proc "
-			+ killspid
-			+ " (@dbname varchar(20)) "
-			+ " as "
-			+ " begin "
-			+ " declare @sql nvarchar(500); "
-			+ " declare @spid int; "
-			+ " set @sql='declare getspid cursor for select spid ' "
-			+ " + 'from sysprocesses where dbid in (select dbid from sysdatabases where name=''' +@dbname+''' )'; "
-			+ " exec(@sql); " + " open getspid ;"
-			+ " fetch next from getspid into @spid; "
-			+ " while @@fetch_status = 0 " + " begin "
-			+ " IF  @spid <> @@SPID " + "   exec('kill '+@spid); "
-			+ " fetch next from getspid into @spid " + " end ;"
-			+ " close getspid; " + " deallocate getspid; " + " end; ";
-
-	var existprocsql = "select object_id('" + killspid + "') as name;";
-	var rs = this.objMasterConn.Execute(existprocsql);
-	var ifExist = false;
-	if (!rs.EOF) {
-		var v = rs.Fields(0).Value;
-		ifExist = (v != null);
-	}
-	if (!ifExist) {
-		/* 该存储过程不存在，则创建 */
-		var rs = this.objMasterConn.Execute(sql);
-	}
-}
-
-dbmanager.killspid = function(dbname) {
-
-	this.notExistCreateKillspid();
-
-	var sql = "exec killspid '" + dbname + "'";
-	var rs = this.objMasterConn.Execute(sql);
-	return rs;
-}
-
 dbmanager.getDataQuoted = function(column, adata) {
 	var dataquoted = "";
 	switch (column.Type) {
@@ -175,6 +73,7 @@ dbmanager.getDataQuoted = function(column, adata) {
 	return dataquoted;
 }
 
+/*
 dbmanager.createTable = function(table) {
 	var sql = "create table " + table.name + "(";
 	if (table.columns) {
@@ -188,6 +87,7 @@ dbmanager.createTable = function(table) {
 		var rs = this.objdbConn.Execute(sql);
 	}
 }
+*/
 
 dbmanager.createTableDDL = function(table) {
 
