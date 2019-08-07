@@ -68,13 +68,16 @@ public class ChromeAppHost {
 
             int length = bytesToInt(msg_length);
 
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < length; i++)
-            {
-                    sb.append((char)in.read());
-            }
+            byte[] byteMsg = new byte[length];
+            in.read(byteMsg, 0, length);
+            String msg = new String(byteMsg, "utf-8");
+//            StringBuilder sb = new StringBuilder();
+//            for (int i = 0; i < length; i++)
+//            {
+//                    sb.append((char)in.read());
+//            }
             /*获得消息*/
-            String msg = sb.toString();
+//            String msg = sb.toString();
 
             ChromeAppMsgProcessor chromeAppMsgProcessor = new ChromeAppMsgProcessor(msg);
             String respmsg = chromeAppMsgProcessor.process();
@@ -87,7 +90,6 @@ public class ChromeAppHost {
                 ChromeAppResponseMessage chromeAppResponseMessage = new ChromeAppResponseMessage(false, e.getMessage());
                 ObjectMapper mapper = new ObjectMapper();
                 response = mapper.writeValueAsString(chromeAppResponseMessage);
-                logger.info(response);
                 sendMsg(response);
             } catch (IOException e1) {
                 logger.error(e1);
@@ -98,10 +100,6 @@ public class ChromeAppHost {
                 ChromeAppResponseMessage chromeAppResponseMessage = new ChromeAppResponseMessage(false,e.getMessage());
                 ObjectMapper mapper = new ObjectMapper();
                 response = mapper.writeValueAsString(chromeAppResponseMessage);
-                logger.info(response);
-                logger.info("e.getMessage() encoding is " + Utils.getEncoding(e.getMessage()));
-                logger.info("reponse encoding is " + Utils.getEncoding(response));
-                logger.info("错误 encoding is " + Utils.getEncoding("错误"));
                 sendMsg(response);
             } catch (IOException e1) {
                 logger.error(e1);
@@ -112,7 +110,6 @@ public class ChromeAppHost {
                 ChromeAppResponseMessage chromeAppResponseMessage = new ChromeAppResponseMessage(false, e.getMessage());
                 ObjectMapper mapper = new ObjectMapper();
                 response = mapper.writeValueAsString(chromeAppResponseMessage);
-                logger.info(response);
                 sendMsg(response);
             } catch (IOException e1) {
                 logger.error(e1);
