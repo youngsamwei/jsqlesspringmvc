@@ -96,6 +96,7 @@ dbmetadata2.getObjectPropertyKeys = function() {
 	return map;
 }
 
+/*获取指定数据库的所有对象及文件的属性*/
 dbmetadata2.getDBTree = function(dbname) {
 	var db = {};
 	db.database = [];

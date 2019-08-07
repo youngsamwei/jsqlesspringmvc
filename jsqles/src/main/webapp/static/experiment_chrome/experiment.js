@@ -256,8 +256,16 @@ experiment.createSQLText = function(quesPreq) {
 experiment.submitsql = "";
 experiment.submit_callback = function(quesid, dbtree, postext, resultset){
         /*先处理从chrome app host返回的sql语句执行结果，如果出错，则报错*/
-        if (( "success" in resultset) && !(resultset.success)){
+        if (resultset && ( "success" in resultset) && !(resultset.success)){
             var info = resultset.msg;
+            experiment.showInfo(info);
+            progressClose();
+            experiment.disabledBtn("submit", false);
+            return;
+        }
+        /* 结构验证时返回结果在dbtree中*/
+        if (dbtree && ( "success" in dbtree) && !(dbtree.success) ){
+            var info = dbtree.msg;
             experiment.showInfo(info);
             progressClose();
             experiment.disabledBtn("submit", false);
@@ -356,8 +364,9 @@ experiment.submit = function( ) {
             }
         }
         if (quesRequiredb) {/* 结构验证*/
-            dbtree = dbmetadata2.getRequiredDBTree(quesRequiredb);
-            experiment.submit_callback(quesid, dbtree, postext, resultset);
+            console.info("结构验证");
+            dbtree = dbmetadata2.getRequiredDBTree(quesRequiredb, db, quesid, postext, resultset, experiment.submit_callback);
+//            experiment.submit_callback(quesid, dbtree, postext, resultset);
         }else{/*结果验证*/
             /*用户提交的代码，但有些题目不需要用户提交代码*/
             var postext = $('#editSQLForm_textarea').val();

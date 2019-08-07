@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import net.sourceforge.jtds.jdbc.JtdsConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.*;
@@ -195,7 +196,13 @@ public class ChromeAppMsgProcessor {
             } else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.help) {
                  con = DriverManager.getConnection(conn_str + "DatabaseName=" + caMsg.getDbname() + ";");
                 response = help(con);
-            } else {
+            }  else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.requireddbtree) {
+                DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor();
+                dbMetadataProcessor.init(caMsg.getDbname());
+                JSONObject tree = dbMetadataProcessor.getRequiredDBTree(caMsg.getRequiredb());
+                response = tree.toString();
+                dbMetadataProcessor.close();
+            }else {
                 response = "{\"success\":false}";
             }
         }

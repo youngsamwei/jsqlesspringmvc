@@ -48,29 +48,6 @@ var dbmetadata2 = {};
 dbmetadata2.jsqlesChromeExtensionId = "oeejofojochggegmkbmjbjhiojakbcme";
 dbmetadata2.defaultDBName = "TestDB";
 dbmetadata2.dataMaxSize = 20;
-dbmetadata2.initConnection = function(dbname) {
-	if (!dbname) {
-		dbname = this.defaultDBName;
-	}
-	var objdbConn = new ActiveXObject("ADODB.Connection");
-	var strdsn = "";
-	if (dbmanager.isexpress) {
-		strdsn = "Integrated Security=SSPI;Provider=SQLOLEDB.1;Data Source=.\\sqlexpress;Initial Catalog="
-				+ dbname;
-	} else {
-		strdsn = "Driver={SQL Server};SERVER=(local);DATABASE=" + dbname;
-	}
-
-	objdbConn.Open(strdsn);
-	this.objdbConn = objdbConn;
-
-}
-
-dbmetadata2.closeConnection = function() {
-	if (this.objdbConn && this.objdbConn.State != 0) {
-		this.objdbConn.close();
-	}
-}
 
 dbmetadata2.getObjectTypeMap = function() {
 	var map = {};
@@ -96,6 +73,7 @@ dbmetadata2.getObjectPropertyKeys = function() {
 	return map;
 }
 
+/*获取指定数据库的所有对象的属性*/
 dbmetadata2.getDBTree = function(dbname) {
 	var db = {};
 	db.database = [];
@@ -404,66 +382,12 @@ dbmetadata2.sp_helptext = function(object_name) {
 	return objrs;
 }
 
-/* 点击提交按钮后调用：获得本地数据库中需要提交至服务器验证的对象描述信息。 */
-dbmetadata2.getRequiredDBTree = function(requiredb) {
-	var database = requiredb.database[0];
-	if (!database) {
-		return {};
-	}
-
-	var dbtree = {};
-	dbtree.database = [];
-	var db = {};
-
-	if (!database.name) {
-		return {};
-	}
-	this.initConnection(database.name);
-
-	/* 指定的数据库是存在的 */
-	db.name = database.name;
-	dbtree.database.push(db);
-
-	this.getAllFiles(db);
-
-	var objectTypeMap = this.getObjectTypeMap();
-	for ( var key in objectTypeMap) {
-		var type = objectTypeMap[key];
-		if (database[type]) {
-			for (var obji = 0; obji < database[type].length; obji++) {
-				var o = database[type][obji];
-
-				var sp_help_rs = this.sp_help(o.full_name);
-				/* 获取对象的基本信息 */
-				this.process_sphelp_baseinfo(o, sp_help_rs);
-				/* 处理其他结果集 */
-				var nextRs = sp_help_rs.NextRecordset();
-				this.process_sphelp_resultset(o, nextRs);
-
-				this.initJsonArray(db, type);
-				db[type].push(o);
-
-				if (type === 'tables') {
-					var triggerRs = this.sp_helptrigger(o.full_name);
-					this.process_sphelp_resultset(o, triggerRs);
-					/* 查询前dataMaxSize条数据 */
-					this.query_data(o, this.dataMaxSize);
-
-					/* 对于table，会发生 Error:There is no text for object */
-					// var text = this.sp_helptext(o.full_name);
-					// this.process_sphelptext(o, text);
-				}
-				if ((type === 'defaults') || (type === 'rules')) {
-					var text = this.sp_helptext(o.full_name);
-					this.process_sphelptext(o, text);
-				}
-			}
-		}
-	}
-
-	/* 获取数据库的属性以及文件files信息 */
-
-	return dbtree;
+dbmetadata2.getRequiredDBTree = function(requiredb, dbname, quesid, postext, resultset, submit_callback){
+    var request = {requestType: "requireddbtree", dbname:dbname, requiredb:JSON.stringify(requiredb)};
+        chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
+          function(dbtree) {
+            submit_callback(quesid, dbtree, postext, resultset);
+        });
 }
 
 /* 多行文本合并 */

@@ -7,13 +7,14 @@ package cn.sdkd.ccse.jsqles.chromeapp.msgprocessor;
  */
 public class ChromeAppRequestMessage {
     public enum RequestType {
-            query, execute, initdb, help
+            query, execute, initdb, help, requireddbtree
     }
 
     RequestType requestType;
     String dbname;
     String sqlText;
     String originMsgText;
+    String requiredb;
 
     public RequestType getRequestType() {
         return requestType;
@@ -45,5 +46,13 @@ public class ChromeAppRequestMessage {
 
     public void setOriginMsgText(String originMsgText) {
         this.originMsgText = originMsgText;
+    }
+
+    public String getRequiredb() {
+        return requiredb;
+    }
+
+    public void setRequiredb(String requiredb) {
+        this.requiredb = requiredb;
     }
 }
