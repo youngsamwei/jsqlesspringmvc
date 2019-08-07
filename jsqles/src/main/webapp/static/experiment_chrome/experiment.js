@@ -255,8 +255,8 @@ experiment.createSQLText = function(quesPreq) {
  */
 experiment.submitsql = "";
 experiment.submit_callback = function(quesid, dbtree, postext, resultset){
-        if (resultset.success){
-        }else{
+        /*先处理从chrome app host返回的sql语句执行结果，如果出错，则报错*/
+        if (( "success" in resultset) && !(resultset.success)){
             var info = resultset.msg;
             experiment.showInfo(info);
             progressClose();
