@@ -39,14 +39,18 @@ public class ChromeAppHost {
 
     }
 
-    /*发送消息*/
+    /*发送消息
+    * 采用utf-8编码，发送的是字节数不是字符串长度
+    * */
     public static void sendMsg(String message) throws IOException {
-        int len = message.length();
+        byte[] msg = message.getBytes("utf-8");
+        int len = msg.length;
         System.out.write((byte)((len>>0) & 0xFF));
         System.out.write((byte)((len>>8) & 0xFF));
         System.out.write((byte)((len>>16) & 0xFF));
         System.out.write((byte)((len>>24) & 0xFF));
-        System.out.write(Utils.getUTF8BytesFromGBKString(message));
+
+        System.out.write(msg);
         System.out.flush();
     }
 
@@ -95,6 +99,9 @@ public class ChromeAppHost {
                 ObjectMapper mapper = new ObjectMapper();
                 response = mapper.writeValueAsString(chromeAppResponseMessage);
                 logger.info(response);
+                logger.info("e.getMessage() encoding is " + Utils.getEncoding(e.getMessage()));
+                logger.info("reponse encoding is " + Utils.getEncoding(response));
+                logger.info("错误 encoding is " + Utils.getEncoding("错误"));
                 sendMsg(response);
             } catch (IOException e1) {
                 logger.error(e1);
