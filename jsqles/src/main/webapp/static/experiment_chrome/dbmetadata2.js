@@ -382,7 +382,8 @@ dbmetadata2.sp_helptext = function(object_name) {
 	return objrs;
 }
 
-dbmetadata2.getRequiredDBTree = function(requiredb, dbname, quesid, postext, resultset, submit_callback){
+dbmetadata2.getRequiredDBTree = function(requiredb, quesid, postext, resultset, submit_callback){
+    var dbname = requiredb.database[0].name;
     var request = {requestType: "requireddbtree", dbname:dbname, requiredb:JSON.stringify(requiredb)};
         chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
           function(dbtree) {

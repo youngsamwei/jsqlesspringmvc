@@ -19,7 +19,7 @@ public class DBMetadataProcessTest {
         try {
             dbMetadataProcessor.init("testdb");
 
-            String json = "{\"database\":[{\"name\":\"testdb\",\"tables\":[{\"schema_name\":\"dbo\",\"type\":\"user table\",\"name\":\"student\",\"full_name\":\"dbo.student\",\"object_id\":2137058649}]}]}";
+            String json = "{\"database\":[{\"name\":\"testdb\",\"tables\":[{\"schema_name\":\"dbo\",\"type\":\"user table\",\"name\":\"sc\",\"full_name\":\"dbo.sc\",\"object_id\":2121058592}]}]}";
             JSONObject jsonObject = dbMetadataProcessor.getRequiredDBTree(json);
             logger.info(jsonObject.toString());
 

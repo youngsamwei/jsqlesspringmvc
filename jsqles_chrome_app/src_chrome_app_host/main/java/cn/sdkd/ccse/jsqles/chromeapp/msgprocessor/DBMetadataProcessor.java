@@ -183,6 +183,7 @@ public class DBMetadataProcessor {
                 fieldValue = rs.getString(1);
                 getPropertyFromResultSet(rec, rs);
             }else{
+                oprFlg = cstmt.getMoreResults();
                 continue;
             }
 
@@ -249,6 +250,8 @@ public class DBMetadataProcessor {
             jsonObject.put("name", rs.getObject(1));
             jsonObject.put("schema_name", rs.getObject(2));
             jsonObject.put("type", rs.getObject(3));
+            /*为与后台验证匹配，增加object_id 属性，但不匹配其值*/
+            jsonObject.put("object_id", "");
             rs.close();
         }
 
@@ -322,9 +325,13 @@ public class DBMetadataProcessor {
                     SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:SSS");
                     String s = format1.format(d);  /* 毫秒如果末尾是俩零则会变成一个零， */
                     jsonObject.put(rs.getMetaData().getColumnName(i), s);
-
+                    break;
                 default:
-                    jsonObject.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+                    if (rs.getObject(i) == null){
+                        jsonObject.put(rs.getMetaData().getColumnName(i), "");
+                    }else {
+                        jsonObject.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
+                    }
             }
         }
         return jsonObject;

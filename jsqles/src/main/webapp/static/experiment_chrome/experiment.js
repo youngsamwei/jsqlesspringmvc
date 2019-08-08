@@ -365,7 +365,7 @@ experiment.submit = function( ) {
         }
         if (quesRequiredb) {/* 结构验证*/
             console.info("结构验证");
-            dbtree = dbmetadata2.getRequiredDBTree(quesRequiredb, db, quesid, postext, resultset, experiment.submit_callback);
+            dbtree = dbmetadata2.getRequiredDBTree(quesRequiredb, quesid, postext, resultset, experiment.submit_callback);
 //            experiment.submit_callback(quesid, dbtree, postext, resultset);
         }else{/*结果验证*/
             /*用户提交的代码，但有些题目不需要用户提交代码*/
