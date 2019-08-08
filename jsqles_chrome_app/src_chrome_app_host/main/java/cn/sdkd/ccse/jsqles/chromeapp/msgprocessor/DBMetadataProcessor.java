@@ -101,6 +101,102 @@ public class DBMetadataProcessor {
         return objectTypeMap;
     }
 
+    /*获取指定数据库的文件及全部数据对象的属性信息*/
+    public JSONObject getDBTree(String dbname) throws SQLException {
+        JSONObject db = new JSONObject();
+        JSONArray databases = new JSONArray();
+        db.put("database", databases);
+        JSONObject database = new JSONObject();
+
+        getAllObjects(dbname, database);
+
+        this.getAllFiles(database);
+        databases.put(database);
+        return db;
+
+    }
+
+    private JSONObject getAllObjects(String dbname, JSONObject database) throws SQLException {
+
+        database.put("name", dbname);
+        String sql = "select  s.name as schema_name, o.type as typeabbr, substring(v.name,5,31) as type, o.name, o.object_id  "
+                + " from sys.all_objects o, sys.schemas s , master.dbo.spt_values v"
+                + " where o.schema_id = s.schema_id and s.name not in ('sys', 'INFORMATION_SCHEMA') "
+                + " and o.type in ('u', 'v', 'fn', 'p', 'r', 'd') and o.type = substring(v.name,1,2) collate database_default  and v.type = 'O9T' "
+                + " order by schema_name, type , name asc  ";
+
+        ResultSet rs = con.createStatement().executeQuery(sql);
+
+        while (rs.next()) {
+            JSONObject o = new JSONObject();
+            o.put("schema_name", rs.getObject(1));
+            o.put("typeabbr", rs.getObject(2));
+            o.put("type", rs.getObject(3));
+            o.put("name", rs.getObject(4));
+            o.put("object_id", rs.getObject(5));
+            o.put("full_name", rs.getString(1) + "." + rs.getObject(4));
+
+            String abbrType = o.getString("typeabbr");
+            String type = this.getObjectTypeMap().get(abbrType);
+
+            CallableStatement cstmt = con.prepareCall("exec sp_help '" + o.get("full_name") + "'");
+            boolean oprFlg = cstmt.execute();
+            if (oprFlg) {
+                ResultSet ohelprs = cstmt.getResultSet();
+            }
+            processNextResultSet(o, cstmt);
+
+            JSONArray objs = null;
+            if (database.has(type)) {
+                objs = database.getJSONArray(type);
+            } else {
+                objs = new JSONArray();
+                database.put(type, objs);
+            }
+            objs.put(o);
+
+            if (type.equalsIgnoreCase("tables")) {
+                this.getTriggerInfo(o);
+                this.queryData(o, this.dataMaxSize);
+
+				/* 对于table，会发生 Error:There is no text for object */
+                // var text = this.sp_helptext(o.full_name);
+                // this.process_sphelptext(o, text);
+
+            } else if (type.equalsIgnoreCase("defaults") || type.equalsIgnoreCase("rules")) {
+                this.processHelpText(o);
+            }
+
+        }
+
+        getAllUserRoles(database);
+
+        return database;
+    }
+
+    private JSONObject getAllUserRoles(JSONObject database) throws SQLException {
+        String sql = "SELECT name, type, type_desc "
+                + " FROM sys.database_principals "
+                + " where name like 'role_%'";
+        ResultSet rs = con.createStatement().executeQuery(sql);
+        while (rs.next()) {
+            JSONObject o = new JSONObject();
+            o.put("role_name", rs.getString(1));
+
+            JSONArray roles = null;
+            if (database.has("roles")) {
+                roles = database.getJSONArray("roles");
+            } else {
+                roles = new JSONArray();
+                database.put("roles", roles);
+            }
+            roles.put(o);
+        }
+
+        return database;
+    }
+
+    /*根据题目设置获取要求的数据库及数据对象的属性信息*/
     public JSONObject getRequiredDBTree(String jsonRequiredb) throws SQLException {
         JSONObject requiredb = new JSONObject(jsonRequiredb);
         JSONArray databases = (JSONArray) requiredb.get("database");
@@ -108,8 +204,6 @@ public class DBMetadataProcessor {
         if (database == null) {
             return new JSONObject();
         }
-        ;
-
         JSONObject dbtree = new JSONObject();
         dbtree.put("database", new JSONArray());
         JSONObject db = new JSONObject();
@@ -178,11 +272,11 @@ public class DBMetadataProcessor {
             JSONObject rec = new JSONObject();
             String fieldName = "";
             String fieldValue = "";
-            if (rs.next()){
+            if (rs.next()) {
                 fieldName = rs.getMetaData().getColumnName(1);
                 fieldValue = rs.getString(1);
                 getPropertyFromResultSet(rec, rs);
-            }else{
+            } else {
                 oprFlg = cstmt.getMoreResults();
                 continue;
             }
@@ -194,7 +288,7 @@ public class DBMetadataProcessor {
                 JSONObject o = props.getJSONObject(i);
                 ps.put(o);
             }
-            props  = ps;
+            props = ps;
 
             if (fieldName.equalsIgnoreCase("Column_name")) {
                 jsonObject.put("columns", props);
@@ -326,9 +420,9 @@ public class DBMetadataProcessor {
                     jsonObject.put(rs.getMetaData().getColumnName(i), s);
                     break;
                 default:
-                    if (rs.getObject(i) == null){
+                    if (rs.getObject(i) == null) {
                         jsonObject.put(rs.getMetaData().getColumnName(i), "");
-                    }else {
+                    } else {
                         jsonObject.put(rs.getMetaData().getColumnName(i), rs.getObject(i));
                     }
             }

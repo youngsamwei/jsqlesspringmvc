@@ -3,9 +3,11 @@
 
 	<script type="text/javascript" src="${staticPath }/static/easyui/ckeditor/ckeditor.js"></script>
 	<script type="text/javascript" src="${staticPath }/static/easyui/ckeditor/adapters/jquery.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbmanager.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/experiment.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbmetadata2.js"></script>
+
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmanager.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/experiment.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmetadata2.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/questionconfig.js"></script>
 
 <script type="text/javascript">
     /*var quespreq = ${question.quespreq} */
@@ -58,13 +60,22 @@
 
     function configQuestionPreqFun(id){
         progressLoad();
+        var v = $('#quespreq').val();
+        var quespreq=$.parseJSON(v);
+
+        var dbname = "Exam";
+        var database = quespreq.database[0];
+        if (database && database.name) {
+            dbname = database.name;
+        }
+
         $("#configQuestionPreq").dialog({
             title: '设置实验前提',
             width : 700,
             height : 800,
             closed: false,
             modal: true,
-            href : '${path }/question/preqConfigPage?id=' + id,
+            href : '${path }/question/preqConfigPage?id=' + id + "&dbname=" + dbname,
             buttons : [ {
                 text : '确定',
                 handler : function() {
@@ -78,6 +89,8 @@
     }
 
     function configQuestionEvalFun(id){
+
+        progressLoad();
 
         $("#configQuestionEval").dialog({
             title: '设置结构验证',
@@ -129,17 +142,9 @@
             });
             return;
         }
-        progressLoad();
         var quespreq=$.parseJSON(v);
 
-        experiment.initDB(quespreq);
-        var sqls = experiment.createSQLText(quespreq);
-        var db = quespreq ? quespreq.database[0].name : null;
-
-        for(var s in sqls){
-            dbmetadata2.execute(sqls[s], db);
-        }
-        progressClose();
+        questionconfig.initDB(quespreq);
     }
 
 

@@ -14,7 +14,7 @@ public class DBMetadataProcessTest {
     protected Logger logger = LogManager.getLogger(DBMetadataProcessor.class);
 
     @Test
-    public void test(){
+    public void testGetRequiredDBTree(){
         DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor();
         try {
             dbMetadataProcessor.init("testdb");
@@ -30,5 +30,22 @@ public class DBMetadataProcessTest {
             e.printStackTrace();
         }
 
+    }
+
+    @Test
+    public void testGetDBTree(){
+        DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor();
+        try {
+            dbMetadataProcessor.init("testdb");
+
+            JSONObject jsonObject = dbMetadataProcessor.getDBTree("testdb");
+            logger.info(jsonObject.toString());
+
+            dbMetadataProcessor.close();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

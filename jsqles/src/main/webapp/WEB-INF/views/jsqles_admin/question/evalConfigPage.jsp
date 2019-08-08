@@ -7,9 +7,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/commons/global.jsp" %>
 
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbmanager.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbmetadata2.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbexplorer_jq.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmanager.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmetadata2.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbexplorer_jq.js"></script>
 
 <script type="text/javascript">
     var quesid = ${question.quesid};
@@ -56,14 +56,16 @@
         var v = $('#quespreq').val();
         var quespreq=$.parseJSON(v);
         var db = quespreq ? quespreq.database[0].name : null;
-        var dbjson = dbexplorer_jq.getDBJson(db);
-        evalOrgTree  = $('#evalOrgTree').tree({
-                url : '',
-                checkbox:true,
-                lines : true,
-                data : dbjson.children
-         });
-         progressClose();
+        var dbjson = dbexplorer_jq.getDBJson(db, function(dbjson){
+                evalOrgTree  = $('#evalOrgTree').tree({
+                        url : '',
+                        checkbox:true,
+                        lines : true,
+                        data : dbjson.children
+                 });
+                 progressClose();
+        });
+
     });
 
     function addDBFun() {

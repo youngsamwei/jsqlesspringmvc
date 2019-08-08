@@ -62,96 +62,6 @@ dbmetadata2.getObjectTypeMap = function() {
 	return map;
 }
 
-dbmetadata2.getObjectPropertyKeys = function() {
-	var map = {};
-	map['schema_name'] = 'schema_name';
-	map['type'] = 'type';
-	map['name'] = 'name';
-	map['full_name'] = 'full_name';
-	map['object_id'] = 'object_id';
-
-	return map;
-}
-
-/*获取指定数据库的所有对象的属性*/
-dbmetadata2.getDBTree = function(dbname) {
-	var db = {};
-	db.database = [];
-	var database = this.getAllObjects(dbname);
-
-	this.getAllFiles(database);
-	db.database.push(database);
-	return db;
-}
-
-dbmetadata2.getAllFiles = function(database) {
-	dbmanager.initMasterConnection();
-
-	var dbrs = dbmanager.sp_helpdb(database.name);
-	var db = this.getPropertyFromResultSet(dbrs);
-	/*Ext.apply(database, db);*/
-
-	var filesrs = dbrs.NextRecordset();
-	var files = this.getPropertiesFromResultSet(filesrs);
-	database.files = files;
-
-	dbmanager.closeMasterConnection();
-}
-
-/* 获取所有的对象 Name, owner, object type */
-dbmetadata2.getAllObjects = function(dbname) {
-	this.initConnection(dbname);
-	var database = {};
-	database.name = dbname;
-	var sql = "select  s.name as schema_name, o.type as typeabbr, substring(v.name,5,31) as type, o.name, o.object_id  "
-			+ " from sys.all_objects o, sys.schemas s , master.dbo.spt_values v"
-			+ " where o.schema_id = s.schema_id and s.name not in ('sys', 'INFORMATION_SCHEMA') "
-			+ " and o.type in ('u', 'v', 'fn', 'p', 'r', 'd') and o.type = substring(v.name,1,2) collate database_default  and v.type = 'O9T' "
-			+ " order by schema_name, type , name asc  ";
-
-	var objrs = this.objdbConn.Execute(sql);
-
-	var map = this.getObjectTypeMap();
-	while (!objrs.EOF) {
-		var o = {};
-		o.schema_name = objrs.Fields(0).Value;
-		o.typeabbr = objrs.Fields(1).Value;
-		o.type = objrs.Fields(2).Value;
-		o.name = objrs.Fields(3).Value;
-		o.object_id = objrs.Fields(4).Value;
-		o.full_name = o.schema_name + "." + o.name;
-
-		var sp_help_rs = this.sp_help(o.full_name);
-		var nextRs = sp_help_rs.NextRecordset();
-		this.process_sphelp_resultset(o, nextRs);
-
-		this.initJsonArray(database, map[o.typeabbr]);
-		database[map[o.typeabbr]].push(o);
-
-		if (map[o.typeabbr] === 'tables') {
-			var triggerRs = this.sp_helptrigger(o.full_name);
-			this.process_sphelp_resultset(o, triggerRs);
-			/* 查询前10条数据 */
-			this.query_data(o, this.dataMaxSize);
-			/* 加上触发器的文本 */
-			// var text = this.sp_helptext(o.full_name);
-			// this.process_sphelptext(o, text);
-		}
-		if ((map[o.typeabbr] === 'defaults') || (map[o.typeabbr] === 'rules')) {
-			var text = this.sp_helptext(o.full_name);
-			this.process_sphelptext(o, text);
-		}
-		objrs.moveNext();
-	}
-
-    /* 增加对自定义role的初始化*/
-    this.getAllUserRoles(database);
-
-	this.closeConnection();
-
-	return database;
-}
-
 dbmetadata2.initJsonArray = function(o, name) {
 	if (!o[name]) {
 		o[name] = [];
@@ -164,101 +74,6 @@ dbmetadata2.initJsonArray = function(o, name) {
 dbmetadata2.getAllUserTypes = function() {
 
 	return {};
-}
-
-dbmetadata2.getAllUserRoles = function(database){
-    var sql = "SELECT name, type, type_desc "
-               + " FROM sys.database_principals "
-               + " where name like 'role_%'";
-    var objrs = this.objdbConn.Execute(sql);
-
-    while (!objrs.EOF) {
-        var o = {};
-		o.role_name = objrs.Fields(0).Value;
-		this.initJsonArray(database, "roles");
-        database["roles"].push(o);
-
-        objrs.moveNext();
-    }
-
-}
-
-dbmetadata2.query_data = function(o, topN) {
-	var sql = "select top " + topN + " * from " + o.full_name;
-	var objrs = this.objdbConn.Execute(sql);
-	o.data = this.getPropertiesFromResultSet(objrs);
-}
-
-dbmetadata2.process_sphelp_resultset = function(o, nextRs) {
-	while (nextRs) {
-
-		if (nextRs.State == 0) {
-			break;
-		}
-		if (!nextRs.EOF) {
-			var rsName = nextRs.Fields.item(0).Name;
-			var rsValue = nextRs.Fields.item(0).Value;
-			var props = this.getPropertiesFromResultSet(nextRs);
-			switch (rsName) {
-			case 'Column_name':
-				o.columns = props;
-				break;
-			case 'Identity':
-				if (!(rsValue === 'No identity column defined.')) {
-					o.identities = props;
-				}
-				break;
-			case 'RowGuidCol':
-				if (!(rsValue === 'No rowguidcol column defined.')) {
-					o.rowguidcols = props;
-				}
-				break;
-			case 'Parameter_name':
-				o.parameters = props;
-				break;
-			case 'Data_located_on_filegroup':
-				break;
-			case 'index_name':
-				o.indexes = props;
-				break;
-			case 'constraint_type':
-				this.post_process_foreignkey(props);
-				o.constraints = props;
-				break;
-			case 'Table is referenced by foreigh key':
-				break;
-			case 'Table is referenced by views':
-				break;
-			case 'trigger_name':
-				o.triggers = props;
-				break;
-			}
-
-		}
-
-		nextRs = nextRs.NextRecordset();
-	}
-	return o;
-}
-
-/* 从单条结果的rs中获取一个对象 */
-/* 2018-07-18 在从sqlserver查询得到的datetime，转换后丢失时间*/
-dbmetadata2.getPropertyFromResultSet = function(nextRs) {
-	var o = {};
-	for (var i = 0; i < nextRs.fields.count; i++) {
-		var item = nextRs.fields.item(i);
-		switch (item.Type) {
-		case 135: /* 日期类型 */
-			var d = new Date(item.Value);
-			var f = formatterdate(d); /* 毫秒如果末尾是俩零则会变成一个零， */
-			o[item.name] = f;
-			break;
-		default:
-			o[item.name] = item.value;
-		}
-
-	}
-	return o;
 }
 
 /*日期格式化*/
@@ -275,29 +90,6 @@ function formatterdate(val, row) {
         var date = new Date(val);
         return date.getFullYear() + '-' + f(date.getMonth() + 1) + '-' + f(date.getDate());
     }
-}
-/* 从多条结果的rs中获取对象数组 */
-dbmetadata2.getPropertiesFromResultSet = function(nextRs) {
-	var objs = [];
-	while (!nextRs.EOF) {
-		var o = this.getPropertyFromResultSet(nextRs);
-		objs.push(o);
-		nextRs.moveNext();
-	}
-	return objs;
-}
-
-/* 返回json格式的查询结果. */
-dbmetadata2.query = function(sql) {
-	if (sql) {
-		this.initConnection();
-		var rs = this.objdbConn.Execute(sql);
-		var json = this.getPropertiesFromResultSet(rs);
-		this.closeConnection();
-		return json;
-	} else {
-		return {}
-	}
 }
 
 /*在chrome中采用扩展实现*/
@@ -317,6 +109,20 @@ dbmetadata2.query = function(sql, dbname, quesid, dbtree, postext, submit_callba
 	}
 }
 
+/*在chrome中采用扩展实现*/
+dbmetadata2.query = function(sql, dbname, query_callback) {
+	if (sql) {
+
+        var request = {requestType: "query", dbname:dbname, sqlText:sql};
+        chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
+          function(json_resultset) {
+            query_callback(json_resultset);
+        });
+
+	} else {
+		return {}
+	}
+}
 
 dbmetadata2.execute = function(sql) {
 	if (sql) {
@@ -352,36 +158,6 @@ dbmetadata2.initDB = function(quesPreq, sqls, initdb_callback) {
 
 }
 
-dbmetadata2.post_process_foreignkey = function(cons) {
-	for (var i = 0; i < cons.length; i++) {
-		var con = cons[i];
-		if (con.constraint_type === 'FOREIGN KEY') {
-			var ref = cons[i + 1];
-			con.references = ref.constraint_keys;
-			/*cons.remove(ref);   extjs 的用法*/
-			cons.splice(i + 1, 1); /*jquery 用法*/
-		}
-	}
-}
-
-dbmetadata2.sp_help = function(object_name) {
-	var sql = "exec sp_help '" + object_name + "'";
-	var objrs = this.objdbConn.Execute(sql);
-	return objrs;
-}
-
-dbmetadata2.sp_helptrigger = function(object_name) {
-	var sql = "exec sp_helptrigger '" + object_name + "'";
-	var objrs = this.objdbConn.Execute(sql);
-	return objrs;
-}
-
-dbmetadata2.sp_helptext = function(object_name) {
-	var sql = "exec sp_helptext '" + object_name + "'";
-	var objrs = this.objdbConn.Execute(sql);
-	return objrs;
-}
-
 dbmetadata2.getRequiredDBTree = function(requiredb, quesid, postext, resultset, submit_callback){
     var dbname = requiredb.database[0].name;
     var request = {requestType: "requireddbtree", dbname:dbname, requiredb:JSON.stringify(requiredb)};
@@ -391,20 +167,10 @@ dbmetadata2.getRequiredDBTree = function(requiredb, quesid, postext, resultset, 
         });
 }
 
-/* 多行文本合并 */
-dbmetadata2.process_sphelptext = function(o, objrs) {
-	var text = "";
-	while (!objrs.EOF) {
-		text = text + " " + objrs.Fields(0).Value;
-		objrs.moveNext();
-	}
-
-	o.text = text;
-}
-/* 单行的信息 */
-dbmetadata2.process_sphelp_baseinfo = function(o, objrs) {
-	o.name = objrs.Fields(0).Value;
-	o.schema_name = objrs.Fields(1).Value;
-	o.type = objrs.Fields(2).Value;
-
+dbmetadata2.getDBTree = function(dbname, getdbtree_callback) {
+        var request = {requestType: "dbtree", dbname:dbname, sqlText : ""};
+        chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
+          function(dbtree) {
+            getdbtree_callback(dbtree);
+        });
 }

@@ -71,13 +71,6 @@ public class ChromeAppHost {
             byte[] byteMsg = new byte[length];
             in.read(byteMsg, 0, length);
             String msg = new String(byteMsg, "utf-8");
-//            StringBuilder sb = new StringBuilder();
-//            for (int i = 0; i < length; i++)
-//            {
-//                    sb.append((char)in.read());
-//            }
-            /*获得消息*/
-//            String msg = sb.toString();
 
             ChromeAppMsgProcessor chromeAppMsgProcessor = new ChromeAppMsgProcessor(msg);
             String respmsg = chromeAppMsgProcessor.process();

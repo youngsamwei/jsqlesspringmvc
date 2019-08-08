@@ -73,22 +73,6 @@ dbmanager.getDataQuoted = function(column, adata) {
 	return dataquoted;
 }
 
-/*
-dbmanager.createTable = function(table) {
-	var sql = "create table " + table.name + "(";
-	if (table.columns) {
-		var columns = table.columns;
-		for (var ci = 0; ci < columns.length - 1; ci++) {
-			sql = sql + this.getColumnDef(columns[ci]) + ", ";
-		}
-		sql = sql + this.getColumnDef(columns[columns.length - 1]);
-		sql = sql + " );"
-
-		var rs = this.objdbConn.Execute(sql);
-	}
-}
-*/
-
 dbmanager.createTableDDL = function(table) {
 
 	if (table.columns) {

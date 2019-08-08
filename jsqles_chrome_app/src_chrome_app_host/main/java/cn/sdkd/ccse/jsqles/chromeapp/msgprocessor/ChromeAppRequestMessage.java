@@ -7,7 +7,7 @@ package cn.sdkd.ccse.jsqles.chromeapp.msgprocessor;
  */
 public class ChromeAppRequestMessage {
     public enum RequestType {
-            query, execute, initdb, help, requireddbtree
+            query, execute, initdb, help, requireddbtree, dbtree
     }
 
     RequestType requestType;

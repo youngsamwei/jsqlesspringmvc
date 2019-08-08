@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -182,4 +183,23 @@ public abstract class BaseController {
 		headers.setContentDispositionFormData("attachment", fileName);
 		return new ResponseEntity<Resource>(resource, headers, status);
 	}
+
+	protected void getExperimentJSPath(Model model){
+
+
+        /*获取浏览器信息，在ie中采用activex访问本地数据库，在chrome中采用native messaging访问本地数据库*/
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes()).getRequest();
+        String header = request.getHeader("User-Agent");
+        header = (header == null) ? "" : header.toUpperCase();
+
+        if (header.contains("MSIE")) {
+            model.addAttribute("experiment_js_path", "experiment");
+        } else if (header.contains("CHROME")) {
+            model.addAttribute("experiment_js_path", "experiment_chrome");
+        } else {
+            model.addAttribute("experiment_js_path", "experiment");
+        }
+    }
+
 }

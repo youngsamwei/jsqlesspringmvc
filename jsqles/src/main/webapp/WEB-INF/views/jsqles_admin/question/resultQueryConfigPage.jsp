@@ -10,7 +10,6 @@
 <script type="text/javascript">
     var quesid = ${question.quesid};
 
-
     var  resultquery = '';
     var  resultcheck = '';
     var  resulterror = '';
@@ -88,6 +87,7 @@
     }
 
     function runSQLFun(){
+        progressLoad();
         var result= '';
         try{
             /* 从questionConfig.jsp页面中获取preq*/
@@ -95,15 +95,21 @@
             var quespreq=$.parseJSON(v);
             var dbname = quespreq.database[0].name;
             var sql = $('#resultquery_sql').val();
-            var jsonresult = dbmetadata2.query(sql, dbname);
-            var result = JSON2.stringify(jsonresult);
-            $('#runsqlinfo').val('执行成功');
-            resulterror = '';
+            var jsonresult = dbmetadata2.query(sql, dbname, function(jsonresult){
+                    var result = JSON2.stringify(jsonresult);
+                    $('#runsqlinfo').val('执行成功');
+                    resulterror = '';
+                    $('#resultcheck_sql').val(result);
+                    progressClose();
+            });
+
         }catch(e){
             $('#runsqlinfo').val('执行错误.\n' + e.message);
             resulterror = e.message;
+            $('#resultcheck_sql').val("");
+            progressClose();
         }
-        $('#resultcheck_sql').val(result);
+
     }
 </script>
 <div class="easyui-layout" data-options="fit:true,border:false">

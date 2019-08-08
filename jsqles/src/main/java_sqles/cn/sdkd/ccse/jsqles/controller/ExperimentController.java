@@ -113,20 +113,8 @@ public class ExperimentController  extends BaseController {
         Long userid = getUserId();
         List<Exercisebook> exers = exercisebookService.selectList(userid, id);
 
-
-        /*获取浏览器信息，在ie中采用activex访问本地数据库，在chrome中采用native messaging访问本地数据库*/
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
-                .getRequestAttributes()).getRequest();
-        String header = request.getHeader("User-Agent");
-        header = (header == null) ? "" : header.toUpperCase();
-
-        if (header.contains("MSIE")) {
-            model.addAttribute("experiment_js_path", "experiment");
-        } else if (header.contains("CHROME")) {
-            model.addAttribute("experiment_js_path", "experiment_chrome");
-        } else {
-            model.addAttribute("experiment_js_path", "experiment");
-        }
+        /*根据浏览器不同设置不同的experiment js path*/
+        getExperimentJSPath(model);
 
         boolean started = false;
         boolean solved = false;

@@ -146,6 +146,9 @@ public class QuestionController extends BaseController {
     public String configPage(Model model, Long id) {
         Question question = questionService.selectById(id);
         model.addAttribute("question", question);
+
+        getExperimentJSPath(model);
+
         return "jsqles_admin/question/questionConfig";
     }
 
@@ -154,6 +157,9 @@ public class QuestionController extends BaseController {
     public String configPreqPage(Model model, Long id) {
         Question question = questionService.selectById(id);
         model.addAttribute("question", question);
+
+        getExperimentJSPath(model);
+
         return "jsqles_admin/question/preqConfigPage";
     }
 
@@ -162,6 +168,9 @@ public class QuestionController extends BaseController {
     public String evalConfigPage(Model model, Long id) {
         Question question = questionService.selectById(id);
         model.addAttribute("question", question);
+
+        getExperimentJSPath(model);
+
         return "jsqles_admin/question/evalConfigPage";
     }
 
@@ -170,6 +179,9 @@ public class QuestionController extends BaseController {
     public String resultQueryConfigPage(Model model, Long id) {
         Question question = questionService.selectById(id);
         model.addAttribute("question", question);
+
+        getExperimentJSPath(model);
+
         return "jsqles_admin/question/resultQueryConfigPage";
     }
 

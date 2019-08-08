@@ -96,7 +96,7 @@ public class ChromeAppMsgProcessor {
         JSONArray sqls = new JSONArray(caMsg.getSqlText());
         for (int i = 0 ; i < sqls.length(); i ++){
             String sql = sqls.getString(i);
-            logger.info(sql);
+//            logger.info(sql);
             con.createStatement().execute(sql);
             con.commit();
         }
@@ -165,7 +165,7 @@ public class ChromeAppMsgProcessor {
         String dbname = caMsg.getDbname();
         JSONArray sqls = new JSONArray(caMsg.getSqlText());
 
-        logger.info(caMsg.getDbname());
+//        logger.info(caMsg.getDbname());
         ResultSet rs = con.createStatement().executeQuery("select name from master.dbo.sysdatabases where [name]='"
                 + dbname + "'");
         if (rs != null){
@@ -173,15 +173,15 @@ public class ChromeAppMsgProcessor {
                 String name = rs.getString("name");
                 killspid(con);
                 dropdb(con);
-                logger.info("dropdb db.");
+//                logger.info("dropdb db.");
             }
             createdb(con);
-            logger.info("create db.");
+//            logger.info("create db.");
 
             /*切换当前数据库*/
             con.createStatement().execute("use " + dbname);
 
-            logger.info(caMsg.getSqlText());
+//            logger.info(caMsg.getSqlText());
             /*逐条执行sqltext中的sql语句*/
             executeOnebyOne(con);
         }else{
@@ -222,6 +222,12 @@ public class ChromeAppMsgProcessor {
                 DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor();
                 dbMetadataProcessor.init(caMsg.getDbname());
                 JSONObject tree = dbMetadataProcessor.getRequiredDBTree(caMsg.getRequiredb());
+                response = tree.toString();
+                dbMetadataProcessor.close();
+            } else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.dbtree) {
+                DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor();
+                dbMetadataProcessor.init(caMsg.getDbname());
+                JSONObject tree = dbMetadataProcessor.getDBTree(caMsg.getDbname());
                 response = tree.toString();
                 dbMetadataProcessor.close();
             }else {

@@ -149,7 +149,7 @@ experiment.init = function( ) {
 //			    console.info("initDB_callback：" + sqls);
             /* 再初始化数据表，数据，约束 */
             if (r && ("success" in r) &&(r.success)){
-    			experiment.showInfo("初始化数据库完成." + infotext)
+                experiment.showInfo("初始化数据库完成." + infotext)
                 experiment.successHandler();
                 progressClose();
             } else {

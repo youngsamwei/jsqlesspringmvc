@@ -7,12 +7,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/commons/global.jsp" %>
 
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbmanager.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbmetadata2.js"></script>
-	<script type="text/javascript" src="${staticPath }/static/experiment/dbexplorer_jq.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmanager.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbmetadata2.js"></script>
+	<script type="text/javascript" src="${staticPath }/static/${experiment_js_path }/dbexplorer_jq.js"></script>
 
 <script type="text/javascript">
     var quesid = ${question.quesid};
+
+    var dbname = '<%=request.getParameter("dbname") %>';
 
     var organizationTree;
     var questionConfigPreqForm;
@@ -48,18 +50,20 @@
             }
         });
 
-        var dbjson = dbexplorer_jq.getDBJson("exam");
-        organizationTree  = $('#configPreqDBTree').tree({
-                url : '',
-                checkbox:true,
-                lines : true,
-                data : dbjson.children
-         });
-         progressClose();
+        var dbjson = dbexplorer_jq.getDBJson(dbname, function(dbjson){
+            organizationTree  = $('#configPreqDBTree').tree({
+                    url : '',
+                    checkbox:true,
+                    lines : true,
+                    data : dbjson.children
+             });
+             progressClose();
+        });
+
     });
 
     function addDBFun() {
-        $.messager.prompt('提示', '请数据库名称', function(r){
+        $.messager.prompt('提示', '请输入数据库名称', function(r){
 				if (r){
                     var dbjson = dbexplorer_jq.getDBJson(r);
                     var db = dbjson.children[0].children;
