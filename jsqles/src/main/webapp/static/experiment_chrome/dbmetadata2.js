@@ -340,10 +340,10 @@ dbmetadata2.execute = function(sql, dbname, execute_callback) {
 	}
 }
 
-dbmetadata2.initDB = function(quesPreq, initdb_callback) {
+dbmetadata2.initDB = function(quesPreq, sqls, initdb_callback) {
 	var database = quesPreq.database[0];
 	if (database && database.name) {
-        var request = {requestType: "initdb", dbname:database.name};
+        var request = {requestType: "initdb", dbname:database.name, sqlText : JSON.stringify(sqls)};
         chrome.runtime.sendMessage(this.jsqlesChromeExtensionId, request,
           function(json_resultset) {
             initdb_callback(json_resultset);

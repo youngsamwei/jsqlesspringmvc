@@ -140,59 +140,32 @@ experiment.init = function( ) {
 	/* 产生创建数据表，增加数据，创建约束 */
 	var sqls = this.createSQLText(quesPreq);
 	var db = quesPreq ? quesPreq.database[0].name : null;
-	var exeSql = function(v) {
-		return function() {
-			try {
-				/* 再初始化数据表，数据，约束 */
-				var sql = sqls[v];
-				/*出现空语句，需要处理异常*/
-				if (sql == ""){
-				    setTimeout(exeSql(v + 1), 200);
-				    return;
-				}
-				dbmetadata2.execute(sql, db, function(){
-                    if (v == (sqls.length - 1)) {
-                        experiment.showInfo("初始化数据库完成." + infotext)
-                        experiment.successHandler();
-                        progressClose();
-                    } else {
-//                        console.info(sqls[v]);
-                        setTimeout(exeSql(v + 1), 50);
-                    }
-				});
 
-			} catch (e) {
-				experiment.showInfo(e.name + " : " + e.message);
 
-				experiment.errorHandler(e.name + " : " + e.message);
-				progressClose();
-			}
-		}
-	};
-
-	setTimeout(function() {
-
-        experiment.showInfo("正在初始化数据库...");
-		try {
-			/* 初始化数据库 */
-			dbmetadata2.initDB(quesPreq, function(r){
+    experiment.showInfo("正在初始化数据库...");
+    try {
+        /* 初始化数据库 */
+        dbmetadata2.initDB(quesPreq, sqls, function(r){
 //			    console.info("initDB_callback：" + sqls);
-                /* 再初始化数据表，数据，约束 */
-                if (sqls.length > 0) {
-                    setTimeout(exeSql(0), 50);
-                } else {
-                    experiment.showInfo(infotext);
-                    experiment.successHandler();
-                    progressClose();
-                }
-			});
+            /* 再初始化数据表，数据，约束 */
+            if (r && ("success" in r) &&(r.success)){
+    			experiment.showInfo("初始化数据库完成." + infotext)
+                experiment.successHandler();
+                progressClose();
+            } else {
+                experiment.showInfo(r.msg);
+                experiment.successHandler();
+                progressClose();
+            }
 
-		} catch (e) {
+        });
 
-			experiment.errorHandler(e.name, e.message);
-			progressClose();
-		}
-	}, 500);
+    } catch (e) {
+
+        experiment.errorHandler(e.name, e.message);
+        progressClose();
+    }
+
 
 }
 

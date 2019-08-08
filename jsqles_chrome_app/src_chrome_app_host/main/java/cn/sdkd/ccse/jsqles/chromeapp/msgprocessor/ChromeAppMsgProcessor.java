@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import net.sourceforge.jtds.jdbc.JtdsConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -84,19 +85,29 @@ public class ChromeAppMsgProcessor {
         String response = "{\"success\":true}";
         logger.info(caMsg.getSqlText());
         con.createStatement().execute(caMsg.getSqlText());
+        con.commit();
         return response;
     }
 
-    /*逐句执行sql语句*/
+    /*逐句执行sql语句, sqltext是jsonarray，多条sql语句*/
     public String executeOnebyOne(Connection con) throws ClassNotFoundException, SQLException {
         String response = "{\"success\":true}";
-        con.createStatement().execute(caMsg.getSqlText());
+
+        JSONArray sqls = new JSONArray(caMsg.getSqlText());
+        for (int i = 0 ; i < sqls.length(); i ++){
+            String sql = sqls.getString(i);
+            logger.info(sql);
+            con.createStatement().execute(sql);
+            con.commit();
+        }
+
         return response;
     }
 
     private void dropdb(Connection con) throws SQLException {
         String sql = "drop database " + caMsg.getDbname();
         con.createStatement().execute(sql);
+        con.commit();
     }
 
     private void killspid(Connection con) throws SQLException {
@@ -104,6 +115,7 @@ public class ChromeAppMsgProcessor {
 
         String sql = "exec killspid '" + caMsg.getDbname() + "'";
         con.createStatement().execute(sql);
+        con.commit();
     }
 
     /*断开数据的所有连接，否则删除时报异常*/
@@ -144,12 +156,15 @@ public class ChromeAppMsgProcessor {
     private void createdb(Connection con) throws SQLException {
         String sql = "create database " + caMsg.getDbname();
         con.createStatement().execute(sql);
+        con.commit();
     }
 
     public String initdb(Connection con) throws ClassNotFoundException, SQLException {
         String response = "{\"success\":true}";
 
         String dbname = caMsg.getDbname();
+        JSONArray sqls = new JSONArray(caMsg.getSqlText());
+
         logger.info(caMsg.getDbname());
         ResultSet rs = con.createStatement().executeQuery("select name from master.dbo.sysdatabases where [name]='"
                 + dbname + "'");
@@ -162,6 +177,13 @@ public class ChromeAppMsgProcessor {
             }
             createdb(con);
             logger.info("create db.");
+
+            /*切换当前数据库*/
+            con.createStatement().execute("use " + dbname);
+
+            logger.info(caMsg.getSqlText());
+            /*逐条执行sqltext中的sql语句*/
+            executeOnebyOne(con);
         }else{
             response = "{\"success\":false}";
         }
