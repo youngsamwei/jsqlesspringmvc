@@ -339,6 +339,24 @@ dbmetadata2.query = function(sql, dbname) {
 	}
 }
 
+/*带回调函数的query*/
+dbmetadata2.query = function(sql, dbname, query_callback) {
+	if (sql) {
+		if (dbname)
+			this.initConnection(dbname)
+		else
+			this.initConnection()
+
+		var rs = this.objdbConn.Execute(sql);
+		var json = this.getPropertiesFromResultSet(rs);
+		this.closeConnection();
+		query_callback(json);
+		return json;
+	} else {
+		return {}
+	}
+}
+
 dbmetadata2.execute = function(sql) {
 	if (sql) {
 		this.initConnection();

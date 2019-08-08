@@ -16,9 +16,11 @@
 
 var dbexplorer_jq = {};
 
- dbexplorer_jq.getDBJson =   function (dbname){
+ dbexplorer_jq.getDBJson =   function (dbname, getdbjson_callback){
         var dbtree = dbmetadata2.getDBTree(dbname);
         var dbjson = this.dbtree2json('foolkey', dbtree);
+
+        getdbjson_callback(dbjson);
         return dbjson;
     }
 

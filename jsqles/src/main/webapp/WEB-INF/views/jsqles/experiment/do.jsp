@@ -105,23 +105,23 @@
                 <c:choose>
                     <c:when  test="${empty question.getIfpostext()}">
                         <tr >
-                             <th>实验内容</td>
+                             <th>实验内容</th>
                                 <td style="height:70%"> <div style="overflow-y:scroll;height:100%" id="quescontent">${question.quescontent}</div>                 </td>
                          </tr>
                     </c:when>
                     <c:otherwise>
                         <tr >
-                             <th>实验内容</td>
+                             <th>实验内容</th>
                                 <td style="height:40%"> <div style="overflow-y:scroll;height:100%" id="quescontent">${question.quescontent}</div>                 </td>
                          </tr>
                         <tr >
                                 <th  colspan = "2">
                                 <div id="sql_tr_tips">请输入完成此实验的sql语句：(请先在SSMS中执行成功，再复制粘贴到这里):</div>
-                                </td>
+                                </th>
                         </tr>
                         <tr >
                             <th></th>
-                            <td style="height:100%;">
+                            <td style="height:30%;">
                             <div id="sql_tr_textarea"  style="overflow-y:scroll;height:100%" >
                                 <textarea  id="editSQLForm_textarea"  style="height:95%;width:98%" value="">${postext}</textarea>
                                 </div>
