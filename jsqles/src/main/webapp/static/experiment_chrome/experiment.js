@@ -196,6 +196,7 @@ experiment.init = function( ) {
 
 }
 
+/*为提高sql语句执行效率，需要对sql分类，然后通过host执行，减少与host的通信时间*/
 experiment.createSQLText = function(quesPreq) {
 	var sqls = [];
 	var database = quesPreq.database[0];

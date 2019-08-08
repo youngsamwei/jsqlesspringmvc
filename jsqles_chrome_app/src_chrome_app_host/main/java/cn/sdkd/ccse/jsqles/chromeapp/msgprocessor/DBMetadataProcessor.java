@@ -231,7 +231,6 @@ public class DBMetadataProcessor {
                 jsonObject.put("triggers", props);
             }
 
-
             oprFlg = cstmt.getMoreResults();
         }
 
