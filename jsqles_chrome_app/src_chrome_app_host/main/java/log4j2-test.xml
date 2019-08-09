@@ -2,7 +2,7 @@
 <Configuration status="off">
     <properties>
         <Property name="console-pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%level] %logger{36} - %msg%n</Property>
-        <property name="error-file">c:/log4j2.log</property>
+        <property name="error-file">log4j2.log</property>
     </properties>
     <Appenders>
 

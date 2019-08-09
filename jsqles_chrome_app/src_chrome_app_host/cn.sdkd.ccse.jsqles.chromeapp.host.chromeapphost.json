@@ -1,7 +1,7 @@
 {
   "name": "cn.sdkd.ccse.jsqles.chromeapp.host.chromeapphost",
   "description": "JSQLES Chrome 应用 Host",
-  "path": "c:\\start_host.bat",
+  "path": "start_host.bat",
   "type": "stdio",
   "allowed_origins": [
     "chrome-extension://oeejofojochggegmkbmjbjhiojakbcme/"
