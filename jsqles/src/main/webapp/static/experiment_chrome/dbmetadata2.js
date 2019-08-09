@@ -93,7 +93,7 @@ function formatterdate(val, row) {
 }
 
 /*在chrome中采用扩展实现*/
-dbmetadata2.query = function(sql, dbname, quesid, dbtree, postext, submit_callback) {
+dbmetadata2.query_submit = function(sql, dbname, quesid, dbtree, postext, submit_callback) {
 	if (sql) {
 
         var request = {requestType: "query", dbname:dbname, sqlText:sql};

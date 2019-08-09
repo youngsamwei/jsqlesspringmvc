@@ -306,7 +306,7 @@ experiment.submit = function( ) {
             }
 
             if (typeof (resultquery) == "string" && resultquery.length > 0) {
-                resultset = dbmetadata2.query(resultquery, db);
+                resultset = dbmetadata2.query_submit(resultquery, db);
             }
         }
 

@@ -323,7 +323,7 @@ dbmetadata2.query = function(sql) {
 	}
 }
 
-dbmetadata2.query = function(sql, dbname) {
+dbmetadata2.query_submit = function(sql, dbname) {
 	if (sql) {
 		if (dbname)
 			this.initConnection(dbname)

@@ -351,7 +351,7 @@ experiment.submit = function( ) {
             }
 
             if (typeof (resultquery) == "string" && resultquery.length > 0) {
-                dbmetadata2.query(resultquery, db, quesid, dbtree, postext, experiment.submit_callback);
+                dbmetadata2.query_submit(resultquery, db, quesid, dbtree, postext, experiment.submit_callback);
             }
         }
 
