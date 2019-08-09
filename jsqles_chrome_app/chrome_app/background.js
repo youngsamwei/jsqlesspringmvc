@@ -26,7 +26,7 @@ function onNativeMessage(message) {
 //connect to native host and get the communicatetion port
 function connectToNativeHost(msg)
 {
-	var nativeHostName = "com.google.chrome.demo";
+	var nativeHostName = "cn.sdkd.ccse.jsqles.chromeapp.host.chromeapphost";
 	console.log(nativeHostName);
  	port = chrome.runtime.connectNative(nativeHostName);
 	port.onMessage.addListener(onNativeMessage);
@@ -67,7 +67,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var port = null;
 var rsp = null;
-var hostName = "com.google.chrome.demo";
+/*hostname 必须全部小写？*/
+var hostName = "cn.sdkd.ccse.jsqles.chromeapp.host.chromeapphost";
 function connect() {
   port = chrome.runtime.connectNative(hostName);
   port.onMessage.addListener(onNativeMessage);

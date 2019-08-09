@@ -1,0 +1,18 @@
+下一步计划使用chrome插件实现实验界面。
+需要实现从插件中访问mssql
+一、解决方案：使用chrome插件运行mssql
+使用chrome native messaging方式与host通信，host实现访问mssql。
+
+详细的通信方式介绍参考：
+https://blog.csdn.net/lee353086/article/details/49362811
+https://crxdoc-zh.appspot.com/apps/runtime#event-onMessage
+
+chrome应用设置扩展白名单
+https://blog.csdn.net/jnxxhzz/article/details/78542360
+
+chrome native messaging相关的中文资料
+https://crxdoc-zh.appspot.com/apps/messaging
+
+
+参考：https://developer.chrome.com/extensions/nativeMessaging
+参考：https://blog.csdn.net/zjqlovelyy/article/details/40183643

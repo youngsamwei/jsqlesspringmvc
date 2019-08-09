@@ -1,6 +1,6 @@
 {
-  "name": "com.google.chrome.demo",
-  "description": "Chrome Native Messaging API Example Host",
+  "name": "cn.sdkd.ccse.jsqles.chromeapp.host.chromeapphost",
+  "description": "JSQLES Chrome 应用 Host",
   "path": "c:\\start_host.bat",
   "type": "stdio",
   "allowed_origins": [

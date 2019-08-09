@@ -9,7 +9,7 @@ function updateResult(obj, state){
 }
 
 function invoke(){
-	var hostName = "com.google.chrome.demo";
+	var hostName = "cn.sdkd.ccse.jsqles.chromeapp.host.chromeapphost";
 	var port = chrome.runtime.connectNative(hostName);
 	port.onMessage.addListener(function(msg) {//收到消息后的处理函数
 	    updateResult("result1", "Received" + JSON.stringify(msg));

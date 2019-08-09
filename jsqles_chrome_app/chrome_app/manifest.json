@@ -4,8 +4,8 @@
 	//  Extension ID:oeejofojochggegmkbmjbjhiojakbcme
 	"manifest_version": 2,
 
-	"name": "Invoke Native Application",
-	"description": "example",
+	"name": "JSQLES Chrome 应用",
+	"description": "为JSQLES提供访问本地MS Sqlserver能力",
 	"version": "1.0",
 
 	"browser_action": {

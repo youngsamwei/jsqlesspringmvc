@@ -1,3 +1,9 @@
+2019-08-09
+1,在设置题目的前提要求时，需要支持批量设置；
+2,在设置题目的前提要求时，默认选择前一次选择；
+
+
+2018-12-31
 1, 提交的quescontent被转义，可能与MappingJackson2HttpMessageConverter配置有关
 2, 当配置URL权限是，配置了/question/config ，也能匹配/question/configPreq, 前缀匹配?
 3, linkbutton在ie11中无效, 使用 $('#preqconfig_btn').bind('click', {id : ${question.quesid}}, configQuestionPreqFun); 绑定带参数的函数调用。
