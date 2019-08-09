@@ -3,6 +3,7 @@ package cn.sdkd.ccse.jsqles.chromeapp.host;
 import cn.sdkd.ccse.jsqles.chromeapp.Utils;
 import cn.sdkd.ccse.jsqles.chromeapp.msgprocessor.ChromeAppMsgProcessor;
 import cn.sdkd.ccse.jsqles.chromeapp.msgprocessor.ChromeAppResponseMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,9 +15,14 @@ import java.sql.SQLException;
  * Created by sam on 2019/8/3.
  */
 public class ChromeAppHost {
+
     protected static Logger logger = LogManager.getLogger(ChromeAppHost.class);
 
-    public static int toInt(byte[] bRefArr) {
+    public void init() throws Exception {
+
+    }
+
+    public int toInt(byte[] bRefArr) {
         int iOutcome = 0;
         byte bLoop;
 
@@ -27,7 +33,7 @@ public class ChromeAppHost {
         return iOutcome;
     }
 
-    public static int bytesToInt(byte[] bytes)
+    public int bytesToInt(byte[] bytes)
     {
 
         int a = bytes[0] & 0xFF;
@@ -42,7 +48,7 @@ public class ChromeAppHost {
     /*发送消息
     * 采用utf-8编码，发送的是字节数不是字符串长度
     * */
-    public static void sendMsg(String message) throws IOException {
+    public void sendMsg(String message) throws IOException {
         byte[] msg = message.getBytes("utf-8");
         int len = msg.length;
         System.out.write((byte)((len>>0) & 0xFF));
@@ -56,6 +62,8 @@ public class ChromeAppHost {
 
     /*工作模式：接收消息-->处理消息-->返回消息*/
     public static void  main(String[] args){
+        ChromeAppHost chromeAppHost = new ChromeAppHost();
+
         /*异常消息格式：success为false，msg为错误描述
         * 正常消息格式：不包含success
         * */
@@ -63,10 +71,11 @@ public class ChromeAppHost {
         InputStream in = System.in;
         byte[] msg_length = new byte[4];
         try {
+            chromeAppHost.init();
 
             in.read(msg_length, 0, 4);
 
-            int length = bytesToInt(msg_length);
+            int length = chromeAppHost.bytesToInt(msg_length);
 
             byte[] byteMsg = new byte[length];
             in.read(byteMsg, 0, length);
@@ -74,7 +83,7 @@ public class ChromeAppHost {
 
             ChromeAppMsgProcessor chromeAppMsgProcessor = new ChromeAppMsgProcessor(msg);
             String respmsg = chromeAppMsgProcessor.process();
-            sendMsg(respmsg);
+            chromeAppHost.sendMsg(respmsg);
             logger.info("msg sended:" + respmsg);
 
         } catch (IOException e) {
@@ -83,7 +92,7 @@ public class ChromeAppHost {
                 ChromeAppResponseMessage chromeAppResponseMessage = new ChromeAppResponseMessage(false, e.getMessage());
                 ObjectMapper mapper = new ObjectMapper();
                 response = mapper.writeValueAsString(chromeAppResponseMessage);
-                sendMsg(response);
+                chromeAppHost.sendMsg(response);
             } catch (IOException e1) {
                 logger.error(e1);
             }
@@ -93,7 +102,7 @@ public class ChromeAppHost {
                 ChromeAppResponseMessage chromeAppResponseMessage = new ChromeAppResponseMessage(false,e.getMessage());
                 ObjectMapper mapper = new ObjectMapper();
                 response = mapper.writeValueAsString(chromeAppResponseMessage);
-                sendMsg(response);
+                chromeAppHost.sendMsg(response);
             } catch (IOException e1) {
                 logger.error(e1);
             }
@@ -103,10 +112,21 @@ public class ChromeAppHost {
                 ChromeAppResponseMessage chromeAppResponseMessage = new ChromeAppResponseMessage(false, e.getMessage());
                 ObjectMapper mapper = new ObjectMapper();
                 response = mapper.writeValueAsString(chromeAppResponseMessage);
-                sendMsg(response);
+                chromeAppHost.sendMsg(response);
             } catch (IOException e1) {
                 logger.error(e1);
             }
+        } catch (Exception e) {
+            logger.error(e);
+            ChromeAppResponseMessage chromeAppResponseMessage = new ChromeAppResponseMessage(false, e.getMessage());
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                response = mapper.writeValueAsString(chromeAppResponseMessage);
+                chromeAppHost.sendMsg(response);
+            } catch (IOException e1) {
+                logger.error(e1);
+            }
+
         }
 
     }
