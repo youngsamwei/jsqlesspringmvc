@@ -17,7 +17,7 @@ import java.sql.*;
 public class ChromeAppMsgProcessor {
     protected Logger logger = LogManager.getLogger(ChromeAppMsgProcessor.class);
     String driver_class = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    /*如何连接上sqlexpress实例?*/
+    /*如何连接上sqlexpress实例? 参考：https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-2017*/
     String conn_str = "jdbc:sqlserver://localhost\\sqlexpress;IntegratedSecurity=true;";
 
     private ChromeAppRequestMessage caMsg;
@@ -40,7 +40,31 @@ public class ChromeAppMsgProcessor {
 
     }
 
+
+    /*使用json产生json串*/
     public String query(Connection con) throws SQLException, ClassNotFoundException {
+        Statement stmt = con.createStatement();//创建Statement
+        ResultSet rs = stmt.executeQuery(caMsg.getSqlText());
+
+        JSONArray response = new JSONArray();
+        while (rs.next()) {
+            JSONObject rec = new JSONObject();
+
+            /*mssql resultset的下标从1开始*/
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                rec.put(rs.getMetaData().getColumnName(i) , rs.getObject(i));
+            }
+            response.put(rec);
+
+        }
+
+        rs.close();
+        stmt.close();
+        return response.toString();
+    }
+
+    @Deprecated
+    public String query2(Connection con) throws SQLException, ClassNotFoundException {
         String response = "{\"success\":false}";
         Statement stmt = con.createStatement();//创建Statement
         ResultSet rs = stmt.executeQuery(caMsg.getSqlText());
