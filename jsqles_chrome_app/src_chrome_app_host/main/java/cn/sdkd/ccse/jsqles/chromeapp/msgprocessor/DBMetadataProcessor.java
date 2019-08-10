@@ -67,16 +67,23 @@ public class DBMetadataProcessor {
     protected Logger logger = LogManager.getLogger(DBMetadataProcessor.class);
 
     private int dataMaxSize = 20;
-    private String driver_class = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    /*如何连接上sqlexpress实例?*/
-    private String conn_str = "jdbc:sqlserver://localhost:1533;IntegratedSecurity=true;instance=./sqlexpress;";
-    private Connection con = null;
 
     private Map<String, String> objectTypeMap;
 
-    public void init(String dbname) throws ClassNotFoundException, SQLException {
-        Class.forName(driver_class);
-        con = DriverManager.getConnection(conn_str + "DatabaseName=" + dbname + ";");
+    private Connection con = null;
+
+    public DBMetadataProcessor(Connection con){
+        this.con = con;
+    };
+
+    public void init(String dbname) throws Exception {
+
+        /*切换为当前数据库*/
+        if (con != null) {
+            con.createStatement().execute("use " + dbname);
+        } else{
+            throw new Exception("con不能为空");
+        }
 
         objectTypeMap = new HashMap<String, String>();
 
@@ -90,11 +97,7 @@ public class DBMetadataProcessor {
     }
 
     public void close() {
-        try {
-            con.close();
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
+
     }
 
     public Map<String, String> getObjectTypeMap() {

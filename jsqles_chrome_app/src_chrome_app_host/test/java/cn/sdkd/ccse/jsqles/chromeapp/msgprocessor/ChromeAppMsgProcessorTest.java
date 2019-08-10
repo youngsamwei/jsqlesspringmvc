@@ -30,6 +30,8 @@ public class ChromeAppMsgProcessorTest {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
@@ -44,6 +46,8 @@ public class ChromeAppMsgProcessorTest {
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

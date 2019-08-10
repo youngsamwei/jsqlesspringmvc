@@ -18,7 +18,7 @@ public class ChromeAppMsgProcessor {
     protected Logger logger = LogManager.getLogger(ChromeAppMsgProcessor.class);
     String driver_class = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     /*如何连接上sqlexpress实例?*/
-    String conn_str = "jdbc:sqlserver://localhost:1533;IntegratedSecurity=true;instance=./sqlexpress;useUnicode=true&characterEncoding=utf8;";
+    String conn_str = "jdbc:sqlserver://localhost\\sqlexpress;IntegratedSecurity=true;";
 
     private ChromeAppRequestMessage caMsg;
 
@@ -199,7 +199,7 @@ public class ChromeAppMsgProcessor {
     }
 
     /*注意：chrome要求的json格式严格*/
-    public String process() throws SQLException, ClassNotFoundException {
+    public String process() throws Exception {
 
         Class.forName(driver_class);
         Connection con = null;
@@ -219,13 +219,15 @@ public class ChromeAppMsgProcessor {
                  con = DriverManager.getConnection(conn_str + "DatabaseName=" + caMsg.getDbname() + ";");
                 response = help(con);
             }  else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.requireddbtree) {
-                DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor();
+                con  = DriverManager.getConnection(conn_str + "DatabaseName=master;");
+                DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor(con);
                 dbMetadataProcessor.init(caMsg.getDbname());
                 JSONObject tree = dbMetadataProcessor.getRequiredDBTree(caMsg.getRequiredb());
                 response = tree.toString();
                 dbMetadataProcessor.close();
             } else if (caMsg.getRequestType() == ChromeAppRequestMessage.RequestType.dbtree) {
-                DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor();
+                con  = DriverManager.getConnection(conn_str + "DatabaseName=master;");
+                DBMetadataProcessor dbMetadataProcessor = new DBMetadataProcessor(con);
                 dbMetadataProcessor.init(caMsg.getDbname());
                 JSONObject tree = dbMetadataProcessor.getDBTree(caMsg.getDbname());
                 response = tree.toString();
