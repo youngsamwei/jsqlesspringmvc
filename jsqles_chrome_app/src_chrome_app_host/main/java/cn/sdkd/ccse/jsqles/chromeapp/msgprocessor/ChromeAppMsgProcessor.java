@@ -75,7 +75,11 @@ public class ChromeAppMsgProcessor {
             l += "},";
             response += l;
         }
-        response = response.substring(0, response.length() - 1) + "]";
+        if (response.equalsIgnoreCase("[")){
+            response +="]";
+        }else {
+            response = response.substring(0, response.length() - 1) + "]";
+        }
         rs.close();
         stmt.close();
         return response;
