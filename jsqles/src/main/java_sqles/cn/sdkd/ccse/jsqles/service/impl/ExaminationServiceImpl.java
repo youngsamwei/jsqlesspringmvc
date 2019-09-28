@@ -1,5 +1,6 @@
 package cn.sdkd.ccse.jsqles.service.impl;
 
+import cn.sdkd.ccse.commons.utils.ConfigUtils;
 import cn.sdkd.ccse.jsqles.mapper.ExaminationMapper;
 import cn.sdkd.ccse.jsqles.model.Examination;
 import cn.sdkd.ccse.jsqles.service.IExaminationService;
@@ -73,7 +74,9 @@ public class ExaminationServiceImpl extends ServiceImpl<ExaminationMapper, Exami
         }
         ts.setSeconds(0);
         ts.setNanos(0);
-        List<Examination> examinationList = examinationMapper.selectCurrentExaminationListByExclassid(classnos, ts);
+
+        boolean control = ConfigUtils.selectCurrentExaminationListControl;
+        List<Examination> examinationList = examinationMapper.selectCurrentExaminationListByExclassid(classnos, ts, control);
 
         return examList2Tree(examinationList);
     }

@@ -30,6 +30,8 @@
         
         <!-- 业务debug日志 -->
         <logger name="com.wangzhixuan" level="DEBUG"/>
+
+        <logger name="cn.sdkd.ccse.commons.utils" level="INFO"/>
         
         <Root level="debug">
             <AppenderRef ref="Console" />

@@ -26,5 +26,8 @@ public interface ExaminationMapper  extends BaseMapper<Examination> {
 
     List<Examination> selectCurrentExaminationListByExclassid(@Param("classnos")List<Long> classnos, @Param("currdate")Timestamp ts);
 
+    List<Examination> selectCurrentExaminationListByExclassid(@Param("classnos")List<Long> classnos, @Param("currdate")Timestamp ts,
+                                                              @Param("control")boolean control);
+
     boolean refreshCache();
 }
